@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>幼狮成长记 · AI狮群</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f2e7cd; --paper2:#e8d9b5; --ink:#3a2a1a; --ink2:#6b5538; --ochre:#b5762c;
+  --earth:#9c4a2a; --acacia:#5f6f34; --line:#c9b48a; --river:#7f9a97;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;}
+body{
+  background-image:
+    radial-gradient(ellipse at 20% 0%,rgba(181,118,44,.12),transparent 60%),
+    radial-gradient(ellipse at 100% 100%,rgba(95,111,52,.10),transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  min-height:100vh;
+}
+.wrap{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 20px);}
+h1{font-weight:900;font-size:30px;letter-spacing:.12em;margin:8px 0 2px;text-align:center}
+.sub{text-align:center;color:var(--ink2);font-size:13px;letter-spacing:.3em;margin-bottom:10px}
+.card{background:rgba(255,250,236,.55);border:1px solid var(--line);border-radius:6px;padding:14px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 2px 8px rgba(80,50,20,.08);}
+.intro p{line-height:1.85;font-size:15px;margin:.4em 0}
+.intro .note{font-size:13px;color:var(--ink2)}
+.threats{font-size:13px;color:var(--ink2);line-height:1.8;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);padding:6px 0;margin:8px 0}
+label{font-size:14px;color:var(--ink2)}
+input[type=text]{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:#fffaf0;color:var(--ink);outline:none}
+input[type=text]:focus{border-color:var(--ochre)}
+button{font:inherit;cursor:pointer;border-radius:5px;border:1px solid var(--ink2);background:#fff6e2;color:var(--ink);padding:10px 12px;font-size:15px;transition:transform .08s,background .2s}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.45;cursor:default}
+.primary{background:var(--earth);color:#fff4e0;border-color:var(--earth);font-weight:600;letter-spacing:.1em}
+.ai-status{font-size:12px;color:var(--ink2);text-align:center;margin-top:10px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#aaa;margin-right:5px;vertical-align:middle}
+.dot.on{background:var(--acacia)} .dot.off{background:var(--earth)}
+.seg{display:flex;gap:6px;margin-top:6px}.seg button{flex:1;padding:8px}.seg button.on{background:var(--ochre);color:#fff8ea;border-color:var(--ochre)}
+
+/* 场景 */
+.scene{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#efe2c2;margin-bottom:10px;box-shadow:0 2px 8px rgba(80,50,20,.08)}
+.scene svg{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.scene-cap{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink2);padding:5px 10px;border-top:1px solid var(--line);background:rgba(255,250,236,.6)}
+.scene-cap b{color:var(--ink)}
+
+/* 游戏 */
+.who{font-size:13px;color:var(--ink2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.who b{color:var(--ink);font-size:15px}
+.bars{display:grid;gap:5px;margin-bottom:10px}
+.bar{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.bar .t{height:7px;flex:1;background:var(--paper2);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.bar .f{height:100%;transition:width .5s}
+.f.food{background:var(--ochre)} .f.hp{background:var(--earth)} .f.mom{background:var(--acacia)}
+.pride{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);border-radius:6px;background:rgba(255,250,236,.6);padding:6px 4px 7px;text-align:center;cursor:pointer;font-size:12px}
+.chip.gone{opacity:.35;cursor:default}
+.chip .face{width:32px;height:32px;margin:0 auto 2px}
+.chip .nm{font-weight:600;font-size:12.5px;word-break:break-all;line-height:1.35}
+.chip .rl{color:var(--ink2);font-size:11px}
+.chip .bond{height:4px;background:var(--paper2);border-radius:2px;margin:5px 6px 0;overflow:hidden}
+.chip .bond i{display:block;height:100%;background:var(--acacia);transition:width .5s}
+.sx{font-weight:600;margin-left:2px}.sx.m{color:#3d5f86}.sx.f{color:#a3476a}
+.log{max-height:44vh;overflow-y:auto;padding:4px 2px 4px 0;margin-bottom:10px;scroll-behavior:smooth}
+.e{margin:9px 0;line-height:1.8;font-size:15px;animation:fade .5s}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+.e.dayh{text-align:center;color:var(--ochre);font-weight:900;letter-spacing:.3em;font-size:13px;margin-top:18px;border-top:1px dashed var(--line);padding-top:12px}
+.e.ev .tt{font-weight:900;font-size:16px;display:block;margin-bottom:2px}
+.e.ev .tag{font-size:11px;border:1px solid var(--line);border-radius:3px;padding:0 5px;margin-left:6px;color:var(--ink2);font-weight:400;vertical-align:2px}
+.e.ev .tag.h{border-color:var(--earth);color:var(--earth)}
+.e.nar{color:var(--ink2);font-style:italic;font-size:14px}
+.e.me{padding-left:10px;border-left:3px solid var(--ochre)}
+.e.ch b{color:var(--earth);font-weight:600;margin-right:4px}
+.e.ch.sib b{color:var(--ochre)}
+.e.out{background:rgba(156,74,42,.07);border-left:3px solid var(--earth);padding:6px 10px;border-radius:0 4px 4px 0}
+.e.simba,.e.patrol{background:rgba(95,111,52,.09);border-left:3px solid var(--acacia);padding:7px 10px;border-radius:0 4px 4px 0;font-size:14.5px}
+.e.patrol{font-size:13.5px;color:#46521f}
+.e.simba b,.e.patrol b{color:var(--acacia)}
+.e.sys{font-size:12.5px;color:var(--ink2);text-align:center}
+.bd{font-size:11px;margin-left:6px;padding:0 5px;border-radius:3px;white-space:nowrap}.bd.up{color:var(--acacia);border:1px solid var(--acacia)}.bd.dn{color:var(--earth);border:1px solid var(--earth)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+.choices button{font-size:14px;padding:9px 8px;line-height:1.4}
+.free{display:flex;gap:7px;margin-bottom:8px}
+.free input{flex:1}
+.free button{white-space:nowrap}
+.simba-btn{width:100%;background:rgba(95,111,52,.12);border-color:var(--acacia);color:#3f4b1f}
+.thinking{text-align:center;color:var(--ink2);font-size:13px;padding:6px;display:none}
+.thinking.on{display:block}
+.thinking span{display:inline-block;animation:bob 1s infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.sheet{position:fixed;inset:0;background:rgba(40,25,10,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}
+.sheet.on{display:flex}
+.sheet .in{background:var(--paper);width:100%;max-width:560px;border-radius:12px 12px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);max-height:75vh;overflow-y:auto}
+.sheet h3{margin:0 0 8px;font-size:17px}
+.sheet ul{padding-left:18px;margin:6px 0;line-height:1.8;font-size:14px}
+.prow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px;line-height:1.5}.prow span{flex:1}.prow input{width:76px;font:inherit;font-size:15px;padding:5px 6px;border:1px solid var(--line);border-radius:4px;background:#fffaf0;color:var(--ink);text-align:right}.prow.chg input{border-color:var(--ochre);background:#fff1d6}
+.pg{font-weight:900;color:var(--ochre);margin:14px 0 2px;letter-spacing:.15em;font-size:13px}
+.pbadge{font-size:11.5px;color:var(--ink2);text-align:center;margin:-2px 0 8px;cursor:pointer;text-decoration:underline dotted}
+.end h2{text-align:center;font-weight:900;letter-spacing:.15em;margin:4px 0 8px}
+.rep-kicker{text-align:center;color:var(--ochre);font-size:12px;letter-spacing:.3em}
+.rsec{border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
+.rsec h3,.cardh{font-size:14px;letter-spacing:.2em;color:var(--ochre);margin:0 0 8px}
+.rl{color:var(--ink2)}
+table.arc{width:100%;border-collapse:collapse;font-size:14px;line-height:1.7}
+table.arc td{padding:4px 0;vertical-align:top;border-bottom:1px dotted var(--line)}
+table.arc td:first-child{width:5.5em;color:var(--ink2)}
+.mbti{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.mbti .big{font-family:Georgia,serif;font-weight:900;font-size:52px;color:var(--earth);letter-spacing:.05em}
+.mbti .ttl{font-weight:900;font-size:18px}
+.mb{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:5px 0}
+.mb .l,.mb .r{width:4.6em;color:var(--ink2)} .mb .r{text-align:right}
+.mb .on{color:var(--ink);font-weight:700}
+.mb .t{flex:1;height:8px;background:var(--paper2);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.mb .t i{display:block;height:100%;background:var(--ochre)}
+.mb .pc{width:3em;text-align:right;color:var(--ink2)}
+ol.tl{padding-left:20px;margin:0;font-size:14px;line-height:1.75}
+ol.tl li{margin-bottom:8px}
+ol.tl .you{color:var(--ochre)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:3px;padding:0 5px;margin-left:6px;color:var(--ink2)}
+.tag.h{border-color:var(--earth);color:var(--earth)}
+.rel{margin:8px 0;font-size:14px}.rel.gone{opacity:.6}.rel i{color:var(--ink2)}
+.rel .mem{font-size:13px;color:var(--ink2)}
+ul.know{padding-left:18px;font-size:14px;line-height:1.75}
+ul.know i{color:var(--ink2);font-size:12px}
+.rsec.note #simbaNote{font-size:15px;line-height:1.95;background:rgba(95,111,52,.07);border-left:3px solid var(--acacia);padding:10px 12px}
+.sig{text-align:right;font-size:13px;color:var(--ink2);margin-top:6px}
+#cardWrap{border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
+#cardImg{display:block;width:100%;max-width:420px;margin:0 auto;border:1px solid var(--line);box-shadow:0 2px 10px rgba(80,50,20,.12)}
+.end p{line-height:1.9;font-size:15px}
+.hidden{display:none!important}
+
+/* 横屏 16:9：电脑、平板 */
+@media (min-width: 900px) and (orientation: landscape){
+  .wrap{max-width:1360px;padding:18px 28px}
+  #start{display:grid;grid-template-columns:1.35fr 1fr;gap:24px;align-items:start}
+  #start .scene{margin:0}
+  #start h1{font-size:38px;text-align:left;margin-top:14px}
+  #start .sub{text-align:left}
+  #game{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:start}
+  #game .left{position:sticky;top:18px}
+  #game .log{max-height:calc(100vh - 330px);min-height:280px}
+  .sheet{align-items:center}
+  .sheet .in{border-radius:10px;max-height:85vh}
+  .end{max-width:860px;margin:3vh auto 0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 开始 -->
+<section id="start">
+  <div>
+    <div class="scene" id="startScene"></div>
+  </div>
+  <div>
+    <h1>幼狮成长记</h1>
+    <div class="sub">第一章 · 河边的灌丛</div>
+    <div class="card intro">
+      <p>你是一只小狮子，出生在马赛马拉恩提亚克提亚克河边的灌丛里。为了生下你们，妈妈独自离开了狮群。</p>
+      <p>妈妈和同窝的兄弟姐妹，<b>每一位都由 AI 扮演</b>。它们有自己的性格，会记住你做过的事，也会自己决定怎么对待你。</p>
+      <p>但它们改变不了草原的规则：狩猎能否成功、危险会不会降临，由按真实生态写成的引擎裁定。</p>
+      <div class="threats">花豹、斑鬣狗、大象、水牛、河马、狒狒、岩蟒、黑曼巴、喷毒眼镜蛇、鼓腹蝰蛇、流浪雄狮、非法放牧、洪水、饥饿……都会威胁你们的生存。星巴带着巡护员的日常巡护，会增加你们活下去的机会。</div>
+      <p class="note">你需要活过两个月，直到妈妈把你们带回狮群。</p>
+      <div style="margin:12px 0 10px">
+        <label for="nameIn">给你的小狮子起个名字</label>
+        <input id="nameIn" type="text" maxlength="8" value="勒卡肯尼">
+      </div>
+      <div style="margin:0 0 12px">
+        <label>性别</label>
+        <div class="seg" id="sexSeg">
+          <button data-v="m" class="on">雄 ♂</button><button data-v="f">雌 ♀</button><button data-v="random">随机</button>
+        </div>
+      </div>
+      <button class="primary" style="width:100%" id="startBtn">出生</button>
+      <div class="ai-status" id="aiStatus"><span class="dot"></span>正在唤醒 AI…</div>
+      <div class="pbadge" style="margin-top:8px" onclick="openParams()">⚙ <span id="paramBadge">生态参数：默认估计</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 游戏 -->
+<section id="game" class="hidden">
+  <div class="left">
+    <div class="scene"><div id="scene"></div><div class="scene-cap"><span id="denLbl"></span><span id="plateLbl"></span></div></div>
+    <div class="who"><span><b id="meName"></b><span id="meSex"></span> · <span id="ageLbl"></span></span><span id="stageLbl"></span></div>
+    <div class="bars">
+      <div class="bar">饱腹<div class="t"><div class="f food" id="foodBar"></div></div></div>
+      <div class="bar">体力<div class="t"><div class="f hp" id="hpBar"></div></div></div>
+      <div class="bar">妈妈<div class="t"><div class="f mom" id="momBar"></div></div></div>
+    </div>
+    <div class="pride" id="pride"></div>
+    <div class="pbadge" onclick="openParams()">⚙ 查看本局使用的生态参数</div>
+  </div>
+  <div class="right">
+    <div class="log card" id="log"></div>
+    <div class="thinking" id="thinking"><span>🐾</span> 正在反应…</div>
+    <div id="controls">
+      <div class="choices" id="choices"></div>
+      <div class="free">
+        <input id="freeIn" type="text" placeholder="或者用你自己的话说想做什么…" maxlength="60">
+        <button id="freeBtn">行动</button>
+      </div>
+      <button class="simba-btn" id="simbaBtn">🌿 求助星巴</button>
+    </div>
+  </div>
+</section>
+
+<!-- 结局 -->
+<section id="end" class="hidden end">
+  <div class="card rep">
+    <div class="rep-kicker" id="endSub"></div>
+    <h2 id="endTitle"></h2>
+    <div id="repBody"></div>
+    <div id="cardWrap" class="hidden">
+      <h3 class="cardh">分享卡片</h3>
+      <img id="cardImg" alt="成长报告分享卡片">
+      <div id="cardHint" class="rl" style="text-align:center;font-size:13px;margin-top:6px"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="hidden" style="flex:1" id="saveCardBtn">保存分享卡片</button>
+      <button class="primary" style="flex:1" id="againBtn">再活一次</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- 记忆面板 -->
+<div class="sheet" id="memSheet"><div class="in">
+  <h3 id="memTitle"></h3>
+  <div id="memBody"></div>
+  <button style="width:100%;margin-top:10px" onclick="closeSheet('memSheet')">关闭</button>
+</div></div>
+
+<!-- 参数面板 -->
+<div class="sheet" id="paramSheet"><div class="in">
+  <h3>⚙ 生态参数</h3>
+  <p style="font-size:13px;color:var(--ink2);margin:0 0 4px;line-height:1.7">游戏里所有“草原规则”都来自这张表：概率填 0~1，体力、饱腹和体况填数值。AI 角色只决定想做什么，结果由这些参数裁定。作者保存后，所有玩家都会使用新参数。</p>
+  <div id="paramMeta" style="font-size:12px;color:var(--ink2)"></div>
+  <div id="paramBody"></div>
+  <div id="paramMsg" style="font-size:13px;color:var(--earth);margin-top:8px;min-height:1em"></div>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button style="flex:1" onclick="resetParams()">恢复默认</button>
+    <button style="flex:1" onclick="closeSheet('paramSheet')">关闭</button>
+    <button class="primary" style="flex:1.4" onclick="saveParams()">保存</button>
+  </div>
+</div></div>
+
+<!-- 星巴面板 -->
+<div class="sheet" id="simbaSheet"><div class="in">
+  <h3>🌿 求助星巴</h3>
+  <p style="font-size:13px;color:var(--ink2);margin:0 0 8px;line-height:1.7">星巴只讲草原的知识，不替你做决定。自然发生的事，他不会插手；人为的伤害，他会带巡护员赶来。每个阶段可以求助一次。</p>
+  <input id="simbaIn" type="text" placeholder="想问星巴什么？（可以留空）" maxlength="60">
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button style="flex:1" onclick="closeSheet('simbaSheet')">算了</button>
+    <button class="primary" style="flex:2" id="simbaAsk">问星巴</button>
+  </div>
+</div></div>
+
+<script>
+/* ============ 工具 ============ */
+const $ = id => document.getElementById(id);
+const r = p => Math.random() < p;
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => [...arr].sort(() => Math.random() - .5);
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait = ms => new Promise(res => setTimeout(res, ms));
+const SXT = s => s==='m' ? '<span class="sx m">♂</span>' : '<span class="sx f">♀</span>';
+function wpick(items){ // [[key, weight]]
+  const tot = items.reduce((a,b)=>a+b[1],0); if (tot <= 0) return null;
+  let x = Math.random()*tot; for (const [k,w] of items){ if ((x -= w) <= 0) return k; } return items[items.length-1][0];
+}
+
+/* ============ AI 连接 ============ */
+let sample = null, aiReady = false, db = null;
+(async () => {
+  try { if (window.claude && typeof window.claude.use === 'function') sample = await window.claude.use('sample'); } catch (e) { sample = null; }
+  aiReady = !!sample;
+  $('aiStatus').innerHTML = aiReady ? '<span class="dot on"></span>AI 已就绪：妈妈和兄弟姐妹由 AI 扮演'
+                                    : '<span class="dot off"></span>离线版：角色使用预设反应 · <a href="https://claude.ai/artifact/YYhYTEwReg3XQyy9X8CAzi" style="color:inherit">完整 AI 版在 claude.ai</a>';
+})();
+function parseJSON(t){ const m = String(t||'').match(/\{[\s\S]*\}/); if(!m) throw new Error('no json'); return JSON.parse(m[0]); }
+async function askJSON(prompt){
+  try {
+    if (typeof sample.json === 'function') { const v = await sample.json(prompt, { modelTier:'default' }); if (v && typeof v === 'object') return v; }
+  } catch (e) {
+    if (e && e.code === 'not_granted') { sample = null; aiReady = false; throw e; }
+    if (e && e.code === 'rate_limited') throw e;
+  }
+  const res = await sample(prompt, { modelTier:'default' });
+  return parseJSON(res.text);
+}
+
+/* ============ 生态参数（作者可校准，所有玩家共用） ============ */
+const PDEF = [
+  ['幼崽与哺乳','cub_need','每个阶段幼崽的饱腹消耗',12,1],
+  ['幼崽与哺乳','starve_dmg','饿到 0 时每阶段体力损失',15,1],
+  ['幼崽与哺乳','milk_gain','母亲体况满分时，一次充分哺乳的饱腹增加',36,1],
+  ['幼崽与哺乳','sib_starve_th','母亲体况低于此值时，最弱的幼崽可能饿死',25,1],
+  ['幼崽与哺乳','sib_starve','上述情况下（同窝 2 只时），一只幼崽饿死的概率',0.25,0.05],
+  ['母亲','mom_start','产后母亲的初始体况',65,1],
+  ['母亲','mom_decay','每个阶段母亲体况下降',8,1],
+  ['母亲','solo_hunt','母狮独自狩猎的成功率',0.35,0.05],
+  ['母亲','hunt_gain','狩猎成功后母亲体况增加',40,1],
+  ['母亲','away_mult','母亲外出时，窝边危险放大倍数',1.5,0.1],
+  ['亲密度','bond_weight','亲密度对结果的影响强度（0 = 无影响，1 = 标准，2 = 加倍）',1,0.1],
+  ['亲密度','guard_eff','母亲守护最多能降低多少危险（满亲密时）',0.6,0.05],
+  ['巡护','patrol_p','人为威胁发生前，巡护队提前发现并处理的概率',0.35,0.05],
+  ['巡护','patrol_vet','母亲带着钢丝伤时，巡护队每阶段发现她的概率',0.35,0.05],
+  ['巡护','patrol_snare_cut','巡护每清除一批钢丝套，之后钢丝套事件的出现权重乘以',0.75,0.05],
+  ['独自在窝','den_hide','母亲不在时，幼崽藏着不动被天敌发现的概率',0.06,0.01],
+  ['独自在窝','den_call','母亲不在时，幼崽叫唤、打闹被发现的概率',0.25,0.05],
+  ['独自在窝','den_explore','母亲不在时，幼崽爬出窝被发现的概率',0.4,0.05],
+  ['独自在窝','den_dmg','被胡狼、猛雕等袭击的体力损失',30,1],
+  ['独自在窝','den_sib','窝被天敌发现时，一只同窝幼崽被叼走的概率',0.25,0.05],
+  ['搬窝','stale_risk','该搬窝却没搬，之后天敌找到窝的额外概率',0.1,0.05],
+  ['搬窝','move_wait','搬窝时乖乖等待被叼的风险',0.04,0.01],
+  ['搬窝','move_follow','搬窝时自己跟着走的风险',0.15,0.05],
+  ['搬窝','move_wander','搬窝时乱跑的风险',0.35,0.05],
+  ['搬窝','move_dmg','搬窝途中遇险的体力损失',28,1],
+  ['斑鬣狗','hy_hide','幼崽躲在窝深处被鬣狗发现的概率',0.1,0.01],
+  ['斑鬣狗','hy_follow','幼崽贴着母亲时被袭的概率',0.12,0.01],
+  ['斑鬣狗','hy_explore','幼崽暴露在外时被袭的概率',0.55,0.05],
+  ['斑鬣狗','hy_dmg','被鬣狗袭击的体力损失',35,1],
+  ['花豹','leo_hide','幼崽藏在窝里被花豹发现的概率',0.15,0.01],
+  ['花豹','leo_follow','幼崽贴着母亲时被袭的概率',0.05,0.01],
+  ['花豹','leo_explore','幼崽独自在外时被袭的概率',0.45,0.05],
+  ['花豹','leo_dmg','被花豹袭击的体力损失',40,1],
+  ['花豹','leo_sib','无人守护时一只同窝幼崽被叼走的概率',0.2,0.05],
+  ['狒狒','bab_attack','母亲不在时，狒狒群攻击幼崽的概率',0.2,0.05],
+  ['狒狒','bab_dmg','被狒狒攻击的体力损失',30,1],
+  ['狒狒','bab_alarm','狒狒的警报叫声暴露窝位置的概率',0.5,0.05],
+  ['狒狒','exposed_risk','窝被暴露后，下一个阶段天敌威胁的额外概率',0.15,0.05],
+  ['岩蟒','py_hide','岩蟒钻进窝时，藏在窝里的幼崽被缠住的概率',0.18,0.01],
+  ['岩蟒','py_follow','贴着母亲的幼崽被缠住的概率',0.05,0.01],
+  ['岩蟒','py_explore','在窝外爬动的幼崽被缠住的概率',0.22,0.01],
+  ['岩蟒','py_sib','母亲不在时，一只同窝幼崽被岩蟒吞掉的概率',0.3,0.05],
+  ['蛇','puff_p','乱爬时踩到鼓腹蝰蛇的概率',0.4,0.05],
+  ['蛇','puff_dmg','被鼓腹蝰蛇咬伤的体力损失',55,1],
+  ['蛇','cobra_p','招惹喷毒眼镜蛇时被喷中眼睛的概率',0.5,0.05],
+  ['蛇','blind_risk','失明期间，天敌威胁的额外概率',0.15,0.05],
+  ['蛇','mamba_p','扑咬黑曼巴时被咬的概率（被咬几乎必死）',0.15,0.05],
+  ['蛇','snake_sib','好奇的同窝幼崽被蛇咬死的概率',0.25,0.05],
+  ['蛇','snake_mom_save','母亲在“教导”时发现蛇并叼开幼崽的概率',0.5,0.05],
+  ['河马','hip_hide','河马上岸时，藏在窝里的幼崽被踩到的概率',0.12,0.01],
+  ['河马','hip_follow','跟着母亲避让时受伤的概率',0.05,0.01],
+  ['河马','hip_explore','在河岸边乱跑时被河马冲撞的概率',0.35,0.05],
+  ['河马','hip_dmg','被河马踩撞的体力损失',45,1],
+  ['大象','ele_hide','象群穿过灌丛时，窝里的幼崽被踩到的概率',0.2,0.05],
+  ['大象','ele_follow','跟着母亲避让时受伤的概率',0.05,0.01],
+  ['大象','ele_explore','靠近象群时被驱赶冲撞的概率',0.5,0.05],
+  ['大象','ele_dmg','被大象冲撞的体力损失',45,1],
+  ['非洲水牛','buf_hide','水牛群冲进灌丛时，躲藏幼崽受伤的概率',0.1,0.01],
+  ['非洲水牛','buf_follow','跟着母亲后撤时受伤的概率',0.12,0.01],
+  ['非洲水牛','buf_explore','暴露在水牛面前时被顶伤的概率',0.5,0.05],
+  ['非洲水牛','buf_dmg','被水牛顶伤的体力损失',40,1],
+  ['洪水','flood_p','河水上涨淹窝时，幼崽被冲走的概率（普通灌丛）',0.3,0.05],
+  ['洪水','flood_dmg','被冲走的体力损失',22,1],
+  ['非法放牧','graze_trample','非法放牧的牛群踩进窝里的概率',0.2,0.05],
+  ['非法放牧','graze_dmg','被牛群踩伤的体力损失',25,1],
+  ['非法放牧','graze_prey','牛群赶走猎物，母亲体况损失',8,1],
+  ['非法放牧','mom_cattle_p','母亲外出时扑杀闯入的牛的概率',0.5,0.05],
+  ['钢丝套','snare_mom','母亲外出时被钢丝套套住的概率',0.45,0.05],
+  ['钢丝套','snare_mom_daily','母亲带着钢丝伤时每阶段额外体况损失',12,1],
+  ['投毒','poison_mom','母亲回到投毒的牛尸旁进食的概率',0.6,0.05],
+  ['投毒','poison_death','母亲中毒后死亡的概率',0.5,0.05],
+  ['流浪雄狮','nomad_weight','流浪雄狮在威胁池里的出现权重（1 = 与其他威胁相同）',0.8,0.1],
+  ['流浪雄狮','nomad_find','流浪雄狮找到窝的概率',0.4,0.05],
+  ['流浪雄狮','cub_follow','窝被找到时，紧贴母亲的幼崽存活率（母亲亲密度 50 时）',0.55,0.05],
+  ['流浪雄狮','cub_hide','窝被找到时，躲藏的幼崽存活率',0.55,0.05],
+  ['流浪雄狮','cub_other','窝被找到时，其他情况下的幼崽存活率',0.3,0.05],
+  ['流浪雄狮','sib_survive','窝被找到时，每只同窝幼崽的存活率',0.4,0.05]
+];
+const PDEFAULT = Object.fromEntries(PDEF.map(d => [d[1], d[3]]));
+let P = { ...PDEFAULT };
+let PMETA = { source:'默认估计', updated:null };
+const CFG_PATH = 'config/ecology';
+function snapData(s){ if (!s) return null; if (typeof s.data === 'function') return s.data(); if (s.exists === false) return null; return s; }
+function applyParams(obj){
+  if (!obj || typeof obj !== 'object') return;
+  const vals = obj.params || obj;
+  for (const k in PDEFAULT) { const v = Number(vals[k]); if (Number.isFinite(v)) P[k] = v; }
+  PMETA = { source: obj.source || '野外校准', updated: obj.updated || null };
+}
+(async () => {
+  try {
+    if (window.claude && typeof window.claude.use === 'function') db = await window.claude.use('db');
+    if (!db) return;
+    const got = await Promise.race([ db.doc(CFG_PATH).get(), new Promise((_, rej) => setTimeout(() => rej('timeout'), 10000)) ]);
+    applyParams(snapData(got));
+  } catch (e) { /* 用默认参数 */ }
+  updateParamBadge();
+})();
+function updateParamBadge(){
+  const el = $('paramBadge');
+  if (el) el.textContent = PMETA.source === '默认估计' ? '生态参数：默认估计' : `生态参数：${PMETA.source}${PMETA.updated ? ' · ' + PMETA.updated.slice(0,10) : ''}`;
+}
+
+/* ============ 河边的四种灌丛 ============ */
+const DEN = {
+  high:{ name:'高处的灌丛', desc:'地势高，不怕河水上涨，但离水远，妈妈去喝水要离开更久。',
+         w:{ flood:.3, hippo:.4 }, m:{ flood:.25, hippo:.5, away:1.15 } },
+  low: { name:'水边低处的灌丛', desc:'紧挨着河，妈妈喝水方便，但雨季怕被淹，河马夜里上岸也会经过。',
+         w:{ flood:2, hippo:2, python:1.3 }, m:{ flood:1.6, hippo:1.8 } },
+  tree:{ name:'大树旁的灌丛', desc:'香肠树遮蔽好，但树上可能有花豹，狒狒也爱在大树上过夜。',
+         w:{ leopard:2, baboon:2 }, m:{ leopard:1.3 } },
+  rock:{ name:'岩石多的灌丛', desc:'干燥隐蔽，但岩缝里容易藏着岩蟒和蛇。',
+         w:{ python:1.8, snake:1.8, hyenas:.7 }, m:{ python:1.3, snake:1.3, hyenas:.8 } }
+};
+const dm = key => (DEN[S.den].m[key] ?? 1);
+
+/* ============ 角色 ============ */
+const MOM = { name:'纳塞里安', maa:'Naserian', meaning:'和平', role:'妈妈', sex:'f', intents:['保护','哺育','出猎','搬窝','教导','休息'], bond:60,
+  persona:'名字在马赛语里是“和平”。六岁的母狮，这是她的第三窝幼崽，前两窝只活下来一只。为了生产，她独自离开狮群，躲进恩提亚克提亚克河边的灌丛。警觉、坚忍，对幼崽温柔但从不溺爱。她知道，自己每离开一次去狩猎，孩子们就要独自面对危险；可她不吃东西，就没有奶水。' };
+/* 马赛语名字：中文音译 · 马赛语原文 · 含义 */
+const MAA_NAMES = {
+  f:[['纳玛伊亚娜','Namayiana','被祝福的'],['纳梅洛克','Namelok','甜美的（父亲表达疼爱时的叫法）'],['西莫伊','Siimoi',''],
+     ['森贝约','Sembeyo',''],['纳尼奥丽','Nanyorri','被爱的'],['梅穆西','Memusi','幸运地降生（马赛部分地区男女通用）']],
+  m:[['勒迈安','Lemayian','被祝福的'],['梅穆西','Memusi','幸运地降生（马赛部分地区男女通用）'],['勒尚','Leshan','雨季出生'],
+     ['勒基雄','Lekishon','有恩典、前途光明'],['勒卡肯尼','Lekakeny','日出时出生'],['勒泰帕','Leteipa','日落时出生']]
+};
+const DEFAULT_NAME = { m:'勒卡肯尼', f:'纳玛伊亚娜' };
+function maaInfo(cn){ for (const sx of ['f','m']) for (const n of MAA_NAMES[sx]) if (n[0]===cn) return { maa:n[1], meaning:n[2] }; return null; }
+const SIB_TEMPER = ['胆子大、力气大，爱抢奶、爱打闹','胆小黏人，总缩在窝的最里面','机灵好奇，什么都想闻一闻、咬一咬','安静，总趴在妈妈身边看着外面'];
+const SIB_INTENTS = ['玩耍','争抢','依偎','躲藏','探索'];
+const SIB_IDS = ['s1','s2','s3','s4'];
+const FACE = {
+  mom:'<svg viewBox="0 0 40 40"><circle cx="20" cy="21" r="13" fill="#d9a35a"/><circle cx="10" cy="11" r="4" fill="#b5762c"/><circle cx="30" cy="11" r="4" fill="#b5762c"/><circle cx="15" cy="19" r="1.6" fill="#3a2a1a"/><circle cx="25" cy="19" r="1.6" fill="#3a2a1a"/><path d="M17 26 q3 3 6 0" stroke="#3a2a1a" stroke-width="1.4" fill="none"/><path d="M18 23 h4 l-2 2z" fill="#3a2a1a"/></svg>',
+  cub:(c)=>`<svg viewBox="0 0 40 40"><circle cx="20" cy="22" r="11" fill="${c}"/><circle cx="11" cy="13" r="4.5" fill="#b58040"/><circle cx="29" cy="13" r="4.5" fill="#b58040"/><circle cx="15.5" cy="20" r="2" fill="#3a2a1a"/><circle cx="24.5" cy="20" r="2" fill="#3a2a1a"/><path d="M16 26 q4 4 8 0" stroke="#3a2a1a" stroke-width="1.4" fill="none"/><circle cx="13" cy="25" r="1" fill="#8a6a40" opacity=".6"/><circle cx="27" cy="25" r="1" fill="#8a6a40" opacity=".6"/></svg>`
+};
+const CUB_COLORS = ['#e2b46c','#d6a85e','#e8bf7a','#cf9f58'];
+const MY_COLOR = '#e8c48a';
+
+/* ============ 状态 ============ */
+let S, sexChoice = 'm';
+function newState(name, sex){
+  const n = 2 + Math.floor(Math.random()*3); // 同窝 2~4 只
+  const used = new Set([name]); const tempers = shuffle(SIB_TEMPER);
+  const chars = { mom:{ ...MOM, mem:[], gone:false } };
+  for (let i = 0; i < n; i++){
+    const sx = r(.5) ? 'm' : 'f';
+    let nm; do { nm = pick(MAA_NAMES[sx]); } while (used.has(nm[0])); used.add(nm[0]);
+    chars[SIB_IDS[i]] = { name:nm[0], maa:nm[1], meaning:nm[2], sex:sx, role:`同窝${sx==='m'?'兄弟':'姐妹'}`, intents:SIB_INTENTS, bond:45 + Math.round(Math.random()*15),
+      persona:`和你同一天出生的${sx==='m'?'雄':'雌'}性幼崽，${tempers[i]}。${nm[2]?`名字在马赛语里是“${nm[2]}”。`:''}`, mem:[], gone:false, color:CUB_COLORS[i] };
+  }
+  const mi = maaInfo(name);
+  return { name, maa: mi?.maa || '', meaning: mi?.meaning || '', sex, turn:0, age:1, food:65, hp:100, momFood:P.mom_start, litter:n,
+    den: wpick([['low',1.2],['tree',1],['rock',1],['high',.8]]), chars,
+    history:[], denStale:false, momHurt:false, momSnared:false, cattleKilled:false, poisonPending:false,
+    blind:0, exposed:0, snareCuts:0, patrolHere:false,
+    simbaToday:false, simbaUsedTurn:-1, evId:null, used:[], threats:0, busy:false,
+    journey:[], cats:{}, freeCount:0, bondUp:0, bondDown:0, patrolHelps:0, simbaAsks:0, denHistory:[], snakeSeen:null };
+}
+const N = k => S.chars[k].name;
+const active = () => Object.keys(S.chars).filter(k => !S.chars[k].gone);
+const sibs = () => SIB_IDS.filter(k => S.chars[k] && !S.chars[k].gone);
+const sibWord = () => { const l = sibs(); if (!l.length) return ''; const sx = new Set(l.map(k => S.chars[k].sex)); return sx.size > 1 ? '兄弟姐妹' : (sx.has('m') ? '兄弟' : '姐妹'); };
+function killSib(text){ const l = sibs(); if (!l.length) return ''; const k = pick(l); S.chars[k].gone = true; return text.replaceAll('{X}', N(k)); }
+
+/* 亲密度：0~1，按影响强度缩放到 0.5 附近 */
+const bondN = k => { const w = clamp(P.bond_weight, 0, 2); const b = S.chars[k].bond / 100; return clamp(0.5 + (b - 0.5) * w, 0, 1); };
+const guardMul = () => 1 - P.guard_eff * (0.5 + 0.5 * bondN('mom'));
+const riskOf = (a, hide, follow, explore) => ({hide, follow, eat:follow, call:(follow+explore)/2, play:(follow+explore)/2, explore, other:(follow+explore)/2})[a] ?? (follow+explore)/2;
+const momAway = I => I.mom === '出猎';
+/* 母亲不在 → 危险放大；母亲守护 → 危险降低；气味重、失明、窝被暴露 → 危险增加 */
+function adjRisk(risk, I, a){
+  if (momAway(I)) risk *= P.away_mult * dm('away');
+  else if (I.mom === '保护' || (I.mom === '搬窝' && a !== 'explore')) risk *= guardMul();
+  if (S.denStale) risk += P.stale_risk;
+  if (S.blind > 0) risk += P.blind_risk;
+  if (S.exposed > 0) risk += P.exposed_risk;
+  return clamp(risk, 0, .95);
+}
+
+/* ============ 时间线：12 个阶段 = 6 个主线 + 6 种威胁 ============ */
+const SCHEDULE = [1, 4, 8, 11, 15, 19, 24, 29, 34, 40, 47, 58];
+const MAIN = { 0:'birth', 1:'alone', 3:'eyes', 5:'move', 10:'meat', 11:'pride' };
+function phase(age){
+  if (age < 11) return { name:'闭眼期', ai:'眼睛还没睁开，只能靠嗅觉和触觉，只会爬、拱、吃奶和细声叫，走不了路。' };
+  if (age < 21) return { name:'睁眼期', ai:'刚睁开眼，视线模糊，四肢摇摇晃晃，能在窝里爬动，还不会走远。' };
+  if (age < 42) return { name:'学步期', ai:'已经能走、能跑几步，开始扑咬打闹，对窝外的世界非常好奇，但仍完全依赖母乳。' };
+  return { name:'好奇期', ai:'能跑会跳，开始跟着母亲出窝活动，乳牙长出，开始尝试吃肉，但仍以母乳为主。' };
+}
+const THREAT_BASE = { leopard:1, hyenas:1, elephant:.8, buffalo:.7, hippo:.8, baboon:.8, python:1.1, snake:1.1, nomads:null, grazing:.9, snare:.9, flood:.7 };
+function pickEvent(turn){
+  if (MAIN[turn]) return MAIN[turn];
+  S.threats++;
+  if (S.poisonPending){ S.poisonPending = false; return 'poison'; }
+  const age = SCHEDULE[turn];
+  const items = [];
+  for (const k in THREAT_BASE){
+    if (S.used.includes(k)) continue;
+    if (k==='python' && age >= 21) continue;
+    if (k==='snake' && age < 21) continue;
+    let w = k==='nomads' ? P.nomad_weight : THREAT_BASE[k];
+    w *= DEN[S.den].w[k] ?? 1;
+    if (k==='snare') w *= Math.pow(P.patrol_snare_cut, S.snareCuts);
+    items.push([k, w]);
+  }
+  return wpick(items) || 'hyenas';
+}
+
+/* ============ 事件（结果由引擎裁定） ============ */
+const EV = {
+  birth:{ title:'出生', type:'自然', plate:['狮','Panthera leo'],
+    desc:()=>`你出生在恩提亚克提亚克河边的${DEN[S.den].name}里。眼睛还睁不开，世界只有河水声、气味和妈妈的心跳。身边还挤着${['','一','两','三','四'][sibs().length]}个小家伙：${sibs().map(N).join('、')}。`,
+    choices:[['拱向妈妈找奶吃','eat'],['挤进{SIBS}中间取暖','play'],['发出细细的叫声','call'],['在草垫上乱爬','explore']],
+    resolve(a,I){
+      if (a==='explore' && r(.3)) return {t:`你爬到了窝的边缘，冷得发抖。${N('mom')}低头把你叼了回来。`,hp:-4};
+      return {t:'远处传来狮群的吼声，可这里只有你们和妈妈，还有整夜不停的河水声。'};
+    }},
+  alone:{ title:'妈妈要出去了', type:'自然', forceMom:'出猎', night:true, plate:['狮','Panthera leo'],
+    desc:()=>`${N('mom')}已经好几天没吃东西了。黄昏时她挨个舔了舔你们，起身钻出灌丛——她必须独自去狩猎。`,
+    choices:[['缩在窝里一动不动','hide'],['细声叫妈妈','call'],['和{S1}挤在一起','play'],['朝着有光的地方爬','explore']],
+    resolve(a,I){ return denDanger(a, I, P.den_hide, P.den_call, P.den_explore, '一只黑背胡狼循着气味摸到窝边', P.den_dmg); }},
+  eyes:{ title:'睁开眼睛', type:'自然', plate:['狮','Panthera leo'],
+    desc:()=>`你第一次睁开了眼睛。世界是模糊的蓝灰色：摇晃的草叶、闪光的河面，还有一张巨大而温柔的脸。${S.momFood<35?`可那张脸瘦了很多，${N('mom')}的肋骨一根根凸了出来。`:''}`,
+    choices:[['盯着妈妈的脸看','follow'],['扑向晃动的草叶','explore'],['去咬{S1}的耳朵','play'],['缩回窝里','hide']],
+    resolve(a,I){
+      if (a==='explore' && r(.25)) return {t:'你一头撞进刺丛，鼻子被金合欢的刺扎破了。',hp:-5};
+      if (a==='follow') return {t:`${N('mom')}低下头，用粗糙的舌头把你从头舔到尾。`,bond:{mom:2}};
+      return {t:'你第一次看清了灌丛外的光。'};
+    }},
+  move:{ title:'搬家', type:'自然', plate:['狮','Panthera leo'], denChoice:true,
+    desc:()=>`窝里的气味越来越重，会招来鬣狗和花豹。${N('mom')}打算搬家——她要把你们一只一只叼到河边另一片灌丛里。`,
+    choices:[['乖乖等妈妈来叼你','hide'],['跟在妈妈后面自己走','follow'],['趁机到处看看','explore'],['大声叫妈妈先叼你','call']],
+    resolve(a,I){
+      if (I.mom !== '搬窝'){ S.denStale = true; return {t:`${N('mom')}犹豫了很久，最后还是没有搬。窝里的气味越来越浓了。`}; }
+      const risk = clamp(riskOf(a, P.move_wait, P.move_follow, P.move_wander), 0, .95);
+      if (r(risk)) return {t:`你落在了后面。一只猛雕从天上俯冲下来，你拼命钻进草丛，背上被抓出几道口子。等${N('mom')}回头找到你时，你已经吓得不会动了。`,hp:-P.move_dmg};
+      return {t:`天黑前，${N('mom')}把你们一只只叼进了新窝。`};
+    }},
+  hyenas:{ title:'夜里的笑声', type:'自然', night:true, plate:['斑鬣狗','Crocuta crocuta'],
+    desc:()=>'夜里，斑鬣狗的笑声越来越近。有一只已经在窝口嗅来嗅去，鼻子几乎伸进了灌丛。',
+    choices:[['缩到妈妈肚子底下','follow'],['钻进窝的最深处','hide'],['冲窝口哈气','explore'],['吓得叫出声','call']],
+    resolve(a,I){ return denDanger(a, I, P.hy_hide*dm('hyenas'), P.hy_follow, P.hy_explore, '那只鬣狗猛地把头探进灌丛', P.hy_dmg, '一声怒吼，把鬣狗赶出了好远'); }},
+  leopard:{ title:'树上的眼睛', type:'自然', plate:['花豹','Panthera pardus'],
+    desc:()=>'一只花豹在窝附近的香肠树上待了一整天，尾巴尖垂下来，轻轻摆动。它一直盯着灌丛。',
+    choices:[['钻到妈妈肚子底下','follow'],['待在窝里不动','hide'],['爬出去看那棵树','explore'],['去叫醒{S1}','call']],
+    resolve(a,I){ return denDanger(a, I, P.leo_hide*dm('leopard'), P.leo_follow, P.leo_explore*dm('leopard'), '一道带斑点的影子无声地落了地', P.leo_dmg, '扑出灌丛，把花豹追回了树上', P.leo_sib); }},
+  baboon:{ title:'狒狒群', type:'自然', plate:['东非狒狒','Papio anubis'],
+    desc:()=>'一大群狒狒沿着河岸翻找果子，越走越近。一头雄狒狒爬上了窝边的大树，正低头往灌丛里看。',
+    choices:[['缩到妈妈肚子底下','follow'],['钻进窝的最深处','hide'],['好奇地抬头看它','explore'],['吓得叫出声','call']],
+    resolve(a,I){
+      const out = []; let hp = 0;
+      if (momAway(I)){
+        let p = adjRisk(riskOf(a, P.bab_attack*.5, P.bab_attack, P.bab_attack*1.8), {mom:'休息'}, a);
+        if (r(p)){
+          out.push('雄狒狒龇着长长的犬齿跳下树，冲进了灌丛。你被一把抓起又甩了出去，摔进刺丛才逃过一劫。'); hp = -P.bab_dmg;
+          if (sibs().length && r(.3)) out.push(killSib('狒狒群走后，{X}不见了。'));
+          return {t:out.join(''),hp};
+        }
+      }
+      if (r(P.bab_alarm * (a==='call'||a==='explore' ? 1.3 : 1))){
+        S.exposed = 1;
+        out.push('雄狒狒发现了你们，发出一连串尖利的警报叫声。整个河岸都知道这里藏着幼狮了——花豹和鬣狗也会听见。');
+      } else out.push('狒狒群吵吵闹闹地走远了，没有发现你们。');
+      return {t:out.join(''),hp};
+    }},
+  python:{ title:'岩缝里的影子', type:'自然', plate:['非洲岩蟒','Python sebae'],
+    desc:()=>`${DEN[S.den].name}里潮湿、安静。一条粗大的非洲岩蟒从岩缝里慢慢滑出来，信子一伸一缩，朝着窝的方向。`,
+    choices:[['往妈妈怀里拱','follow'],['缩在窝里不动','hide'],['往窝外爬','explore'],['细声叫唤','call']],
+    resolve(a,I){
+      let risk = riskOf(a, P.py_hide, P.py_follow, P.py_explore) * dm('python');
+      if (momAway(I)) risk *= P.away_mult;
+      const out = []; let hp = 0;
+      if (r(clamp(risk,0,.95))){
+        if (!momAway(I) && r(.45 + .4*bondN('mom'))){ out.push(`岩蟒一口咬住你，身体一圈圈缠了上来。${N('mom')}疯了一样扑上去撕咬，岩蟒终于松开，滑回了岩缝。你喘了很久才缓过来。`); hp = -20; }
+        else { out.push('岩蟒一口咬住你，冰冷的身体一圈圈缠紧……你再也没能呼吸。'); hp = -999; }
+      } else if (sibs().length && (momAway(I) ? r(P.py_sib) : r(P.py_sib*.25))){
+        out.push(killSib('岩蟒没有找到你，却缠住了{X}。等妈妈回来时，岩缝前只剩一道拖痕。'));
+      } else out.push(momAway(I) ? '岩蟒在窝边绕了一圈，又滑回了岩缝。' : `${N('mom')}闻到了蛇的气味，低吼着把它逼回了岩缝。`);
+      return {t:out.join(''),hp};
+    }},
+  snake:{ title:'草里的蛇', type:'自然', plate:['蛇','Serpentes'],
+    desc:()=>{ S.snakeKind = S.snakeKind || pick(['puff','cobra','mamba']);
+      S.plateOverride = SNAKE_PLATE[S.snakeKind]; S.snakeSeen = S.snakeKind;
+      return { puff:'河边的草里伏着一条粗短的蛇，花纹和枯叶几乎一模一样，一动不动。',
+               cobra:'一条深色的蛇在窝边昂起了头，颈部的皮褶张开，嘶嘶作响。',
+               mamba:'一条细长的灰色大蛇从灌丛边飞快地滑过，带起一阵沙沙声。' }[S.snakeKind]; },
+    choices:[['扑上去咬它','explore'],['跟着妈妈走开','follow'],['趴着不动','hide'],['冲它哈气','call']],
+    resolve(a,I){
+      const kind = S.snakeKind; S.snakeKind = null;
+      const NAME = { puff:'鼓腹蝰蛇', cobra:'喷毒眼镜蛇', mamba:'黑曼巴' }[kind];
+      if (I.mom==='教导' && r(P.snake_mom_save)) return {t:`${N('mom')}一眼就认出那是一条${NAME}，低吼着叼起你的后颈，把你拖得远远的。（有些东西，永远不要碰。）`,bond:{mom:3}};
+      const out = []; let hp = 0;
+      const curious = (a==='explore'||a==='play'||a==='call');
+      if (kind==='puff'){
+        if (r(curious ? P.puff_p : (a==='hide' ? .03 : .1))){ out.push('你一爪踩在了它身上。鼓腹蝰蛇闪电般回头咬了一口，伤口很快肿得发黑。'); hp = -P.puff_dmg; }
+        else out.push('你差一点就踩到了它。那是一条鼓腹蝰蛇，它始终一动不动。');
+      } else if (kind==='cobra'){
+        if (r(curious ? P.cobra_p : .08)){ S.blind = 3; out.push('喷毒眼镜蛇猛地喷出一股毒液，正中你的眼睛。火辣辣的疼，眼前什么也看不见了。'); hp = -10; }
+        else out.push('喷毒眼镜蛇嘶嘶地退进了草丛。');
+      } else {
+        if (a==='explore' && r(P.mamba_p)){ out.push('你扑了上去。黑曼巴快得看不清，一口咬在你的脖子上……毒液几分钟就发作了。'); hp = -999; }
+        else out.push('黑曼巴受了惊，眨眼间就消失在灌丛深处。');
+      }
+      const cur = sibs().filter(k => I[k]==='探索');
+      if (hp > -999 && cur.length && r(P.snake_sib)){ const k = pick(cur); S.chars[k].gone = true; out.push(`${N(k)}好奇地凑了过去……${NAME}咬了它一口。到了傍晚，${N(k)}再也没有动。`); }
+      return {t:out.join(''),hp};
+    }},
+  hippo:{ title:'上岸的河马', type:'自然', night:true, plate:['河马','Hippopotamus amphibius'],
+    desc:()=>'夜深了，几头河马从河里爬上岸吃草。它们沿着走了几百年的老路，一路踩进了河边的灌丛。',
+    choices:[['跟着妈妈让开','follow'],['趴在窝里不动','hide'],['往河边跑','explore'],['吓得叫出声','call']],
+    resolve(a,I){
+      let risk = riskOf(a, P.hip_hide, P.hip_follow, P.hip_explore) * dm('hippo');
+      if (momAway(I) && a==='follow') risk = P.hip_hide * dm('hippo');
+      if (!momAway(I) && (I.mom==='保护'||I.mom==='搬窝') && a!=='explore') risk *= guardMul();
+      if (r(clamp(risk,0,.95))) return {t:'一头河马受了惊，张开巨口冲了过来。灌丛被压塌了一半，你被它沉重的脚掌扫中，滚进了泥里。',hp:-P.hip_dmg};
+      return {t: a==='hide' ? '河马粗重的喘气声就在头顶，地面在颤。它们吃了一夜草，天亮前回到了河里。' : `${N('mom')}带着你们退到一边，河马一路嚼着草走过去了。`};
+    }},
+  elephant:{ title:'象群过境', type:'自然', plate:['非洲草原象','Loxodonta africana'],
+    desc:()=>'一群大象带着小象下河喝水，正好要穿过你们藏身的灌丛。领头的母象扬起鼻子，嗅到了狮子的气味。',
+    choices:[['跟着妈妈让开','follow'],['趴在窝里不动','hide'],['冲大象哈气','explore'],['好奇地看小象','explore']],
+    resolve(a,I){
+      let risk = riskOf(a, P.ele_hide, P.ele_follow, P.ele_explore);
+      if (momAway(I) && a==='follow') risk = P.ele_hide;
+      if (!momAway(I) && (I.mom==='保护'||I.mom==='搬窝') && a!=='explore') risk *= guardMul();
+      if (r(clamp(risk,0,.95))) return {t:'母象耳朵一张，尖啸着冲进灌丛。枝条像纸一样被踩断，你被象鼻扫中，滚出去好几米。',hp:-P.ele_dmg};
+      return {t: a==='hide' ? '巨大的脚掌就落在窝边，地面在颤抖。象群终于走过去了。' : `${N('mom')}叼起你退到一边，象群慢悠悠地走过，没有回头。`};
+    }},
+  buffalo:{ title:'水牛群', type:'自然', plate:['非洲水牛','Syncerus caffer'],
+    desc:()=>`一大群非洲水牛下河饮水，慢慢压向灌丛。几头老公牛抬起头，鼻孔喷着粗气。${N('mom')}只有一头母狮，绝不会去招惹它们。`,
+    choices:[['跟着妈妈后撤','follow'],['钻进灌丛深处','hide'],['从灌丛里探头看','explore'],['冲水牛哈气','call']],
+    resolve(a,I){
+      const risk = adjRisk(riskOf(a, P.buf_hide, P.buf_follow, P.buf_explore), I, a);
+      if (r(risk)) return {t:'一头公牛低头冲进灌丛，牛角擦过你的身体，把你顶翻在地。',hp:-P.buf_dmg};
+      return {t:'水牛群闻到了狮子的气味，在灌丛外打转、跺蹄，最后才慢慢散开。'};
+    }},
+  flood:{ title:'河水上涨', type:'自然', night:true, flood:true, plate:['恩提亚克提亚克河','Ntiakitiak River'],
+    desc:()=>'上游下了一整夜的暴雨。天还没亮，恩提亚克提亚克河的水就漫过了河岸，浑黄的水一寸寸往灌丛里涨。',
+    choices:[['紧贴着妈妈','follow'],['和{SIBS}挤成一团','play'],['往高处爬','explore'],['冲着水声叫','call']],
+    resolve(a,I){
+      if (I.mom==='搬窝') return {t:`${N('mom')}在黑暗里把你们一只只叼到了高处。你们浑身湿透，但都安全。`};
+      let risk = P.flood_p * dm('flood') * (momAway(I) ? P.away_mult : 1);
+      if (a==='follow' && !momAway(I)) risk *= .3;
+      if (a==='explore') risk *= .6;
+      if (r(clamp(risk,0,.95))){
+        let t = '一股浑水冲进窝里，把你卷了出去。你在黑暗里挣扎了很久，才抓住一根树根爬上了岸。';
+        if (sibs().length && r(.35)) t += killSib('天亮后，{X}再也没有回来。');
+        return {t,hp:-P.flood_dmg};
+      }
+      return {t: S.den==='high' ? '水涨到了坡下就停住了。高处的窝救了你们。' : '水一直涨到窝边才停下。你们冻得直哆嗦，熬到了天亮。',hp:-3};
+    }},
+  grazing:{ title:'闯进来的牛群', type:'人为', plate:['非法放牧','Illegal grazing'],
+    desc:()=>'一群牛被人非法赶进了保护区，闯进河边的灌丛乱啃乱踩。放牧的人挥着棍子，把牛群一路往你们的窝这边赶。',
+    choices:[['缩在妈妈身边','follow'],['躲进灌丛深处','hide'],['探出头看那些牛','explore'],['吓得叫出声','call']],
+    resolve(a,I){
+      if (S.patrolHere || S.simbaToday) return {t:`星巴和巡护员赶到了。他们把非法闯入的牛群赶出了保护区，还记下了放牧者的身份，交给保护区管理处处理。${N('mom')}一直伏在灌丛里没有动。`};
+      const out = []; let hp = 0;
+      S.momFood -= P.graze_prey;
+      out.push('牛群把附近的羚羊都赶跑了。');
+      if (momAway(I) && r(P.mom_cattle_p)){ S.cattleKilled = true; S.poisonPending = true; S.momFood += 30; out.push(`${N('mom')}实在太饿了，趁黄昏扑倒了一头落单的牛，吃了个饱。放牧的人发现后，咒骂着离开了。`); }
+      const p = P.graze_trample * (a==='explore'||a==='call' ? 1.5 : 1) * (!momAway(I) && I.mom==='保护' ? guardMul() : 1);
+      if (r(clamp(p,0,.95))){ out.push('牛群冲进灌丛，你被一只牛蹄踩中，疼得缩成一团。'); hp = -P.graze_dmg; }
+      return {t:out.join(''),hp};
+    }},
+  poison:{ title:'牛尸的气味', type:'人为', plate:['投毒','Poisoning'],
+    desc:()=>`${N('mom')}还惦记着那头牛的尸体，又一次朝那里走去。可尸体的气味不对——放牧的人回来过，在上面撒了东西。`,
+    choices:[['追着妈妈叫','call'],['缩在窝里等','hide'],['跟着妈妈出窝','follow'],['和{SIBS}挤在一起','play']],
+    resolve(a,I){
+      if (S.patrolHere || S.simbaToday) return {t:`星巴和巡护员赶在${N('mom')}之前找到了那具牛尸，把它运走销毁。投毒者也被报告给了保护区管理处。`};
+      const eats = (I.mom==='出猎' || I.mom==='休息') ? P.poison_mom : P.poison_mom * .5;
+      if (r(eats)){
+        if (r(P.poison_death)){ S.momDead = true; return {t:`${N('mom')}吃了几口，傍晚回到窝边时已经站不稳了。她躺下来，最后一次把你们拢到身边……第二天早上，她再也没有醒来。`}; }
+        S.momHurt = true; S.momFood = Math.min(S.momFood, 15);
+        return {t:`${N('mom')}吃了几口就开始呕吐、抽搐，在窝边躺了整整两天。她活了下来，却虚弱得几乎没有奶水。`};
+      }
+      return {t:`${N('mom')}嗅了嗅，低吼一声，掉头回到了窝里。`};
+    }},
+  snare:{ title:'妈妈没回来', type:'人为', forceMom:'出猎', night:true, plate:['钢丝套','Snare'],
+    desc:()=>`${N('mom')}出去狩猎，一整夜都没回来。你们在窝里饿得直叫。`,
+    choices:[['缩在窝里等','hide'],['不停地叫妈妈','call'],['爬到窝口张望','explore'],['和{SIBS}挤在一起','play']],
+    resolve(a,I){
+      const den = denDanger(a, I, P.den_hide, P.den_call, P.den_explore, '一只胡狼循着叫声摸了过来', P.den_dmg);
+      if (S.patrolHere || S.simbaToday){ S.snareCuts++; den.t += `天亮时${N('mom')}回来了——星巴和巡护员前一天在她狩猎的路线上清除了好几个钢丝套。`; return den; }
+      if (r(P.snare_mom)){ S.momHurt = true; S.momSnared = true; S.momFood -= 15; den.t += `第二天中午，${N('mom')}才一瘸一拐地出现。她的脖子上勒着一圈钢丝，伤口已经发炎。`; }
+      else den.t += `天亮时${N('mom')}回来了，身上带着一股陌生的铁锈味。`;
+      return den;
+    }},
+  nomads:{ title:'陌生的雄狮', type:'自然', night:true, plate:['流浪雄狮','Panthera leo'],
+    desc:()=>'深夜，两头陌生的年轻雄狮沿着河岸走来，一路低吼。它们闻到了幼崽的气味。',
+    choices:[['死死贴着妈妈','follow'],['钻进最深的灌丛','hide'],['趴着一动不动','other'],['从另一边逃出去','explore']],
+    resolve(a,I){
+      const find = P.nomad_find * (S.denStale ? 1.3 : 1) * (S.exposed ? 1.3 : 1) * (I.mom==='搬窝' ? .5 : 1);
+      if (!r(clamp(find,0,.95))) return {t:'它们在离窝几十米的地方停了很久，最后沿着河岸走远了。'+(I.mom==='搬窝'?`${N('mom')}连夜把你们转移了，没留下一点气味。`:'')};
+      let sv;
+      if (a==='follow' && !momAway(I)) sv = P.cub_follow + (bondN('mom') - .5) * .4 + (I.mom==='保护' ? .1 : 0);
+      else if (a==='hide') sv = P.cub_hide;
+      else if (a==='explore') sv = P.cub_other * .7;
+      else sv = P.cub_other;
+      if (momAway(I)) sv *= .6;
+      sv = clamp(sv, 0, .95);
+      const lost = [];
+      for (const k of sibs()) if (!r(P.sib_survive)) { S.chars[k].gone = true; lost.push(N(k)); }
+      const sibLine = lost.length ? `天亮后，${lost.join('、')}再也没有回来。` : (sibs().length ? `${sibs().map(N).join('、')}也活了下来。` : '');
+      if (!momAway(I)) S.momHurt = S.momHurt || r(.5);
+      if (r(sv)) return {t:`雄狮冲进了灌丛。${momAway(I)?'妈妈不在，':`${N('mom')}疯了一样扑上去撕咬，`}你在混乱中钻进了最密的刺丛，一直躲到天亮。${sibLine}`};
+      return {t:'雄狮发现了你……新来的雄狮会杀死不是自己后代的幼崽，好让母狮尽快再次发情。这是草原上残酷却常见的事。',hp:-999};
+    }},
+  meat:{ title:'第一口肉', type:'自然', plate:['狮','Panthera leo'],
+    desc:()=>`${N('mom')}在河边扑倒了一头疣猪，把它拖到了窝边。这是你第一次闻到鲜肉的味道。`,
+    choices:[['学着妈妈撕咬','eat'],['还是想吃奶','follow'],['抢{S1}嘴里那块','play'],['在一旁闻一闻','hide']],
+    resolve(a,I){
+      S.momFood += 35;
+      if (a==='eat') return {t:'你用还没长全的乳牙使劲撕扯，满脸是血，终于咽下了第一口肉。',food:22};
+      if (a==='play' && sibs().length){
+        const k = sibs()[0];
+        if (I[k]==='争抢' && bondN(k) < .6) return {t:`${N(k)}护着肉冲你龇牙，一爪拍在你的鼻子上。`,food:8,hp:-4};
+        return {t:`你和${N(k)}一人咬住一头，拔河一样扯了半天，最后各吃了一块。`,food:16};
+      }
+      if (a==='hide') return {t:'你凑近闻了闻，又退了回去。肉的味道太陌生了。',food:5};
+      return {t:'你还是更想吃奶。'};
+    }},
+  pride:{ title:'回到狮群', type:'自然', final:true, plate:['狮群','Panthera leo'],
+    desc:()=>`你快两个月大了。这天清晨，${N('mom')}带着你们离开河边的灌丛，走向远处的狮群。你第一次见到别的母狮、别的小狮子，还有统治这片领地的雄狮。`,
+    choices:[['紧跟着妈妈','follow'],['躲在妈妈腿后偷看','hide'],['跑向别的小狮子','explore'],['凑过去闻雄狮','other']],
+    resolve(a,I){
+      if (a==='other'){
+        if (r(.35)) return {t:'雄狮低吼一声，一爪把你拍开。你吓得滚回妈妈脚边——但它没有再追。',hp:-6};
+        return {t:`雄狮低头嗅了嗅你，喉咙里咕噜了一声，又躺了回去。它认得${N('mom')}的气味。`};
+      }
+      if (a==='explore') return {t:'一头母狮舔了舔你的脸，别的小狮子扑上来和你打成一团。狮群里的母狮会互相哺育幼崽——从今天起，你有了一个大家庭。',food:10};
+      return {t:`狮群里的母狮们走过来，挨个嗅你们。${N('mom')}和她们碰了碰头，发出低低的呼噜声。你们回家了。`};
+    }}
+};
+
+const SNAKE_PLATE = { puff:['鼓腹蝰蛇','Bitis arietans'], cobra:['喷毒眼镜蛇','Naja nigricollis'], mamba:['黑曼巴','Dendroaspis polylepis'] };
+
+/* 窝被天敌盯上的通用裁定 */
+function denDanger(a, I, hide, follow, explore, intro, dmg, guardText, sibP){
+  const risk = adjRisk(riskOf(a, hide, follow, explore), I, a);
+  const out = []; let hp = 0;
+  const guard = !momAway(I) && (I.mom==='保护'||I.mom==='教导'||I.mom==='哺育');
+  if (r(risk)){
+    if (guard && r(.3 + .5*bondN('mom'))) out.push(`${intro}，${N('mom')}${guardText||'怒吼着扑出灌丛，把它赶走了'}。`);
+    else {
+      out.push(`${intro}。你拼命往刺丛深处钻，还是被咬住拖出去一段，身上留下了几道血口。`); hp = -dmg;
+      if (sibs().length && r(sibP ?? P.den_sib)) out.push(killSib('等一切安静下来，{X}不见了。'));
+    }
+  } else {
+    if (!guard && sibs().length && r((sibP ?? P.den_sib) * risk * 1.5)) out.push(killSib('你藏得很好，可{X}的叫声引来了天敌……天亮后，{X}不见了。'));
+    else out.push(momAway(I) ? '你们在黑暗里挤成一团，一声也不敢出，熬到了天亮。' : '危险在窝外徘徊了很久，最后离开了。');
+  }
+  return {t:out.join(''),hp};
+}
+
+/* ============ 后台巡护 ============ */
+const PATROL_LOG = [
+  '星巴和巡护员沿着恩提亚克提亚克河步行巡护，远远记下了你们这窝的位置。',
+  '巡护队在河岸的兽道上清除了一个旧钢丝套。',
+  '星巴的越野车停在远处的坡上，他用望远镜看了很久，在本子上写了几行字。',
+  '巡护员在保护区边界检查了一圈，没有发现牛群闯入。',
+  '巡护队沿着河岸巡查，记录了附近花豹和鬣狗的足迹。'
+];
+function patrolTick(){
+  const ev = EV[S.evId];
+  S.patrolHere = ev.type === '人为' && r(P.patrol_p);
+  if (S.momSnared && r(P.patrol_vet)){
+    S.momSnared = false; S.momHurt = false; S.momFood = Math.min(100, S.momFood + 10); S.patrolHelps++;
+    addLog('patrol', `<b>巡护记录：</b>巡护员在河边发现了脖子上勒着钢丝的${esc(N('mom'))}。星巴叫来兽医，用麻醉镖让她睡着，剪开钢丝，清理了伤口。`);
+    return;
+  }
+  if (!S.patrolHere && r(.45)){
+    const line = pick(PATROL_LOG);
+    if (/钢丝套/.test(line)){ S.snareCuts++; S.patrolHelps++; }
+    addLog('patrol', `<b>巡护记录：</b>${esc(line)}`);
+  }
+}
+
+/* ============ 场景（野外笔记风手绘 SVG） ============ */
+const INK = '#3a2a1a';
+const HAND = '"Zhi Mang Xing","Ma Shan Zheng","Kaiti SC","STKaiti",cursive';
+let _uid = 0;
+/* 一个形状 = 水彩底色 + 墨线轮廓 */
+function shp(d, fill, op=.95, sw=1.3){
+  return `<path d="${d}" fill="${fill}" opacity="${op}" filter="url(#wc)"/><path d="${d}" fill="none" stroke="${INK}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" filter="url(#ink)"/>`;
+}
+function ln(d, sw=1.1, col=INK, op=1){ return `<path d="${d}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" opacity="${op}" vector-effect="non-scaling-stroke"/>`; }
+function dots(pts, r, col, op=.75){ return pts.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${op}"/>`).join(''); }
+function rings(pts, r, col){ return pts.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${col}" stroke-width="1.1" opacity=".8" vector-effect="non-scaling-stroke"/>`).join(''); }
+const G = (x, y, s, flip, inner) => `<g transform="translate(${x},${y}) scale(${flip?-s:s},${s})">${inner}</g>`;
+
+/* 手绘动物：底色 + 明暗（裁在轮廓内）+ 花纹 + 墨线 */
+let _aid = 0;
+function fig(body, base, inner, extra = '', back = ''){
+  const id = 'a' + (++_aid);
+  return `${back}<clipPath id="${id}"><path d="${body}"/></clipPath>
+    <path d="${body}" fill="${base}"/>
+    <g clip-path="url(#${id})">${inner}</g>
+    <path d="${body}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" filter="url(#ink)"/>${extra}`;
+}
+const fp = (d, fill, op = 1, more = '') => `<path d="${d}" fill="${fill}" opacity="${op}" ${more}/>`;
+const fl = (d, w = 1, col = INK, op = 1) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
+const SOFT = 'filter="url(#blur2)"';
+function spotsIn(list, r, col, op = .7){ return list.map(([x, y, k = 1]) => `<ellipse cx="${x}" cy="${y}" rx="${r * k}" ry="${r * k * .8}" fill="${col}" opacity="${op}" transform="rotate(${(x * 7 + y * 3) % 60 - 30} ${x} ${y})"/>`).join(''); }
+
+/* 趴着的母狮（喂奶、守窝），面朝右。原点在脚底中心附近，约 330×150 */
+function lionHead(dx = 0, dy = 0, base = '#d6aa68'){
+  const head = 'M244,58 C240,40 252,24 270,21 C283,19 295,25 301,35 C310,39 322,45 327,53 C331,60 329,68 323,72 C316,79 303,81 292,79 C278,84 262,80 252,72 C247,68 245,63 244,58 Z';
+  const headInner =
+    fp('M286,62 C300,56 322,56 332,64 C330,78 310,84 290,80 Z', '#f3e3bf', .95, SOFT) +
+    fp('M244,60 C250,74 266,82 286,80 C270,90 246,80 240,64 Z', '#a87a42', .5, SOFT) +
+    fp('M262,26 C276,22 292,28 300,38 C286,34 272,34 262,38 Z', '#e2bb7c', .7, SOFT);
+  const face =
+    fp('M254,30 C248,15 262,8 271,18 C273,23 270,28 266,31 Z', '#b98a4c') + fl('M254,30 C248,15 262,8 271,18', 1.4) + fp('M257,27 C254,19 261,15 266,20 C266,24 263,27 260,28 Z', '#5a3e24', .8) +
+    fp('M290,42 C294,38 301,38 305,42 C301,45 294,45 290,42 Z', '#c98a2e') + `<circle cx="298" cy="41.6" r="2.1" fill="${INK}"/><circle cx="298.8" cy="40.8" r=".7" fill="#fff"/>` +
+    fl('M288,41 C293,36 302,36 307,41', 1.4) + fl('M305,43 C309,47 313,50 318,52', 1, INK, .6) +
+    fp('M320,51 C324,49 329,51 329,55 C327,58 323,58 320,56 Z', '#4a2e22') +
+    fl('M325,58 C324,63 321,66 316,67 M321,66 C314,72 304,72 298,68', 1.2) +
+    spotsIn([[308,62],[312,65],[306,66],[311,60]], .9, INK, .6) +
+    fl('M312,62 l16,-3 M312,65 l17,1 M311,68 l15,5', .6, INK, .45);
+  return `<g transform="translate(${dx},${dy})">${fig(head, base, headInner, face)}</g>`;
+}
+function lionessLying(){
+  const body = 'M52,166 C36,150 36,116 58,100 C80,84 122,82 162,84 C188,84 206,78 222,64 C230,54 240,46 252,42 L270,78 C270,96 268,108 262,118 C278,128 304,138 336,144 C350,146 354,158 346,164 C340,168 330,168 320,168 L252,168 C240,168 232,166 226,162 C208,166 190,168 172,168 L96,168 C76,168 60,170 52,166 Z';
+  const inner =
+    fp('M30,150 C70,140 150,150 230,160 C270,164 330,160 360,150 L360,180 L30,180 Z', '#a87a42', .55, SOFT) +
+    fp('M40,130 C36,110 50,96 66,92 C56,110 56,134 66,160 L44,164 Z', '#a87a42', .5, SOFT) +
+    fp('M150,150 C180,140 220,140 250,150 C240,166 180,170 150,166 Z', '#efd9ae', .8, SOFT) +
+    fp('M236,70 C250,84 262,100 258,120 C270,112 274,90 268,72 Z', '#efd9ae', .7, SOFT) +
+    fp('M70,96 C110,84 170,84 215,74 C180,92 120,96 80,104 Z', '#e2bb7c', .7, SOFT) +
+    fl('M74,112 C102,96 140,108 146,146 C148,158 158,164 190,164', 1.2, INK, .55) +
+    fl('M222,160 C226,146 236,134 252,128', 1.1, INK, .5) + fl('M262,150 C282,152 304,154 322,154', 1, INK, .45) +
+    fl('M330,152 l10,2 M328,158 l12,1', .9, INK, .5) + fl('M176,160 l12,1 M176,165 l12,0', .8, INK, .45) +
+    fl('M90,120 l6,-3 M100,128 l6,-3 M112,120 l6,-3 M124,130 l6,-3 M190,104 l6,-3 M204,112 l6,-3 M180,118 l6,-3', .8, '#9a6e3a', .5);
+  const tail = fl('M54,158 C24,160 20,176 52,178 C76,180 96,176 112,174', 6.5, INK) + fl('M54,158 C24,160 20,176 52,178 C76,180 96,176 112,174', 4.6, '#cfa15e') + `<ellipse cx="116" cy="173.6" rx="9" ry="4.2" fill="#3e2a18" transform="rotate(-6 116 173.6)"/>`;
+  return `<ellipse cx="190" cy="170" rx="165" ry="7" fill="${INK}" opacity=".14" ${SOFT}/>` + tail + fig(body, '#d3a663', inner) + lionHead();
+}
+
+/* 两个月大的幼崽，带斑点，面朝右，约 190×130 */
+function cubStanding(col = '#dcb274'){
+  const far = fp('M112,100 L114,134 C114,139 126,139 126,134 L128,104 Z', '#b98f55') + fl('M112,100 L114,134 C114,139 126,139 126,134 L128,104', 1.2) +
+              fp('M46,104 C44,116 44,126 46,134 C46,139 58,139 58,134 L62,108 Z', '#b98f55') + fl('M46,104 C44,116 44,126 46,134 C46,139 58,139 58,134 L62,108', 1.2);
+  const body = 'M30,92 C28,74 52,64 86,66 C104,67 118,64 128,56 L146,84 C146,96 144,104 140,110 L142,134 C142,140 126,140 126,134 L124,112 C112,117 96,118 82,116 C78,120 76,128 76,134 C76,140 60,140 60,134 L58,112 C44,112 32,104 30,92 Z';
+  const inner =
+    fp('M56,104 C80,112 110,112 140,100 L146,120 L50,124 Z', '#f1dfb6', .85, SOFT) +
+    fp('M28,90 C30,76 44,68 60,66 C46,78 42,96 50,112 Z', '#b98f55', .5, SOFT) +
+    spotsIn([[44,80],[54,74,1.1],[64,84],[74,74],[84,84,1.1],[94,74],[104,84],[114,76],[60,96],[78,98],[96,98],[112,96],[124,88],[66,122,.8],[132,122,.8],[134,108,.8],[50,92,.9]], 3, '#9b6c38', .5) +
+    fl('M124,112 C124,104 128,98 134,94', 1, INK, .5) + fl('M62,138 l0,-4 M68,138 l0,-4 M130,138 l0,-4 M136,138 l0,-4', .8, INK, .5);
+  const head = 'M122,50 C119,30 136,17 156,19 C174,21 186,36 184,52 C189,56 190,64 185,69 C177,79 160,82 146,78 C132,74 123,63 122,50 Z';
+  const headInner =
+    fp('M152,58 C164,52 184,54 192,64 C186,80 164,84 150,78 Z', '#f6e8c8', .95, SOFT) +
+    fp('M122,52 C126,66 138,76 152,78 C138,84 120,72 118,56 Z', '#b98f55', .45, SOFT) +
+    spotsIn([[140,30,.7],[150,26,.7],[160,28,.7],[146,36,.6],[156,35,.6],[134,40,.6]], 2.2, '#9b6c38', .5);
+  const ears = (x, y) => `<circle cx="${x}" cy="${y}" r="10.5" fill="#8a6234" stroke="${INK}" stroke-width="1.3"/><circle cx="${x + .5}" cy="${y + 1.5}" r="6" fill="#f0dcb4"/>`;
+  const face =
+    `<ellipse cx="158" cy="48" rx="4.6" ry="5" fill="#2a1c10"/><circle cx="159.6" cy="46" r="1.5" fill="#fff"/>` +
+    `<ellipse cx="176" cy="50" rx="3.4" ry="4.4" fill="#2a1c10"/><circle cx="177" cy="48.4" r="1.1" fill="#fff"/>` +
+    fl('M151,42 C155,38 162,38 165,42', 1.1, INK, .7) +
+    fp('M176,60 C180,58 186,59 187,62 C185,66 180,66 177,64 Z', '#6a4034') +
+    fl('M182,66 C182,70 179,72 175,72 M182,69 C186,72 189,70 190,67', 1.1) +
+    spotsIn([[168,66],[171,69],[166,70]], .9, INK, .55) + fl('M168,67 l-14,-2 M168,70 l-14,3', .6, INK, .4);
+  const tail = fl('M32,90 C18,88 12,100 18,110', 5.5, INK) + fl('M32,90 C18,88 12,100 18,110', 3.8, col) + `<circle cx="18.6" cy="111" r="3.6" fill="#4a3018"/>`;
+  return `<ellipse cx="90" cy="138" rx="72" ry="4.5" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, col, inner) + ears(134, 24) + ears(172, 24) + fig(head, col, headInner, face);
+}
+
+/* 斑鬣狗，面朝左：肩高臀低，约 260×170 */
+function hyena(){
+  const far = fp('M118,118 L120,154 C120,160 134,160 134,154 L136,118 Z', '#6e5a40') + fl('M118,118 L120,154 C120,160 134,160 134,154 L136,118', 1.2) +
+              fp('M196,112 C202,126 204,140 204,152 C204,160 218,160 218,154 L216,116 Z', '#6e5a40') + fl('M196,112 C202,126 204,140 204,152 C204,160 218,160 218,154 L216,116', 1.2);
+  const body = 'M98,46 C128,50 164,64 194,78 C216,86 234,94 240,110 C244,122 240,130 236,136 C238,144 240,150 240,156 C240,161 226,162 224,156 L220,138 C212,132 204,126 198,118 C176,124 150,124 128,120 L126,156 C126,162 110,162 110,156 L108,122 C100,116 94,108 92,100 C82,98 70,92 62,84 L58,58 C68,48 84,44 98,46 Z';
+  const inner =
+    fp('M90,104 C120,120 170,122 205,112 L240,150 L90,150 Z', '#e4d3ae', .7, SOFT) +
+    fp('M196,82 C220,86 238,98 242,114 C238,130 226,134 214,128 C218,110 210,94 196,82 Z', '#7a6446', .45, SOFT) +
+    fp('M60,60 C76,48 96,46 112,50 C96,56 80,64 66,78 Z', '#c9b48a', .7, SOFT) +
+    spotsIn([[112,66,1.2],[128,60],[142,72,1.3],[124,80],[156,66],[170,80,1.2],[150,90],[184,92,1.1],[134,96,1.2],[166,104],[200,104,1.2],[214,92],[116,98],[224,112,1.1],[190,116],[146,112],[118,134,.8],[116,146,.7],[228,140,.8],[230,150,.7],[100,78],[86,70,.8]], 4.2, '#3f2e1c', .72) +
+    fl('M108,122 C106,112 108,104 114,98', 1, INK, .5) + fl('M200,118 C200,106 206,98 216,96', 1, INK, .5);
+  const crest = fl('M70,50 l-3,-7 M78,47 l-2,-8 M86,45 l-1,-8 M94,44 l0,-8 M102,45 l1,-8 M110,47 l2,-7 M120,50 l3,-7 M130,53 l3,-6 M142,57 l3,-6', 1.6, '#4a3824', .85);
+  const head = 'M72,52 C58,44 40,48 30,60 C22,68 12,74 9,84 C8,91 14,96 22,95 C36,98 52,96 62,90 C74,84 80,66 72,52 Z';
+  const headInner =
+    fp('M4,74 C14,70 26,72 32,80 C34,92 22,100 8,96 Z', '#34281e', .95, SOFT) +
+    fp('M34,62 C44,54 58,52 70,56 C60,58 48,64 40,74 Z', '#cdb88e', .7, SOFT) +
+    fp('M40,92 C54,94 66,88 72,78 C74,92 56,102 40,98 Z', '#7a6446', .5, SOFT);
+  const ear = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#6e5a40" stroke="${INK}" stroke-width="1.3"/><circle cx="${x - .5}" cy="${y + 1}" r="${r * .55}" fill="#3a2c20"/>`;
+  const face = `<ellipse cx="38" cy="68" rx="3" ry="2.6" fill="#1e140c"/><circle cx="37.2" cy="67.2" r=".9" fill="#fff"/>` + fl('M33,65 C36,62 41,62 44,65', 1.1, INK, .7) +
+    fp('M8,82 C8,78 14,77 16,80 C16,84 12,86 9,85 Z', '#140e0a') + fl('M12,90 C20,93 30,92 38,88', 1.2) ;
+  const tail = fl('M238,108 C250,112 252,128 247,140', 8, INK) + fl('M238,108 C250,112 252,128 247,140', 6, '#8a7250') + fl('M250,124 C251,132 249,138 246,142', 6.4, '#2e2218');
+  return `<ellipse cx="130" cy="158" rx="118" ry="6" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, '#b39a70', inner, crest) + ear(70, 47, 9.5) + ear(52, 46, 8.5) + fig(head, '#b39a70', headInner, face);
+}
+
+/* 站着的狮子（母狮 / 雄狮），面朝右，约 340×190，脚底 y=185 */
+function lionStanding(male = false){
+  const base = male ? '#c99a58' : '#d3a663';
+  const far = fp('M212,110 L218,178 C218,184 234,184 234,178 L238,110 Z', '#a87a42') + fl('M212,110 L218,178 C218,184 234,184 234,178 L238,110', 1.2) +
+              fp('M98,114 C108,134 112,152 112,178 C112,184 128,184 128,178 L126,116 Z', '#a87a42') + fl('M98,114 C108,134 112,152 112,178 C112,184 128,184 128,178 L126,116', 1.2);
+  const body = 'M40,78 C44,60 76,54 120,56 C160,58 190,56 214,50 C226,40 240,32 254,30 L274,70 C272,86 264,96 256,102 L260,178 C260,185 242,185 242,178 L236,120 C228,124 216,124 208,120 C180,128 130,128 104,122 C100,136 96,152 96,178 C96,185 78,185 78,178 C78,150 76,130 70,116 C54,110 38,98 40,78 Z';
+  const inner =
+    fp('M70,112 C110,126 180,128 240,112 L262,140 L70,140 Z', '#efd9ae', .8, SOFT) +
+    fp('M38,80 C42,64 58,58 74,56 C60,72 58,96 68,118 Z', '#a87a42', .5, SOFT) +
+    fp('M236,56 C252,72 266,84 258,104 C272,96 278,78 270,60 Z', '#efd9ae', .6, SOFT) +
+    fp('M70,58 C120,52 180,56 220,48 C180,66 110,70 72,68 Z', '#e2bb7c', .6, SOFT) +
+    fl('M70,116 C66,96 78,78 100,74', 1.1, INK, .45) + fl('M236,120 C232,104 236,88 246,78', 1.1, INK, .45) +
+    fl('M244,180 l0,-5 M252,180 l0,-5 M82,180 l0,-5 M90,180 l0,-5', .8, INK, .5) +
+    fl('M120,84 l6,-3 M136,92 l6,-3 M152,84 l6,-3 M170,94 l6,-3 M190,84 l6,-3', .8, '#9a6e3a', .5);
+  const tail = fl('M42,76 C22,82 14,112 24,142', 6.5, INK) + fl('M42,76 C22,82 14,112 24,142', 4.6, base) + `<ellipse cx="25" cy="146" rx="4.6" ry="8" fill="#3e2a18"/>`;
+  let mane = '';
+  if (male){
+    const m = 'M224,34 C216,2 252,-22 290,-12 C312,-6 322,12 318,30 C326,58 310,96 282,110 C256,120 230,104 226,80 C220,64 220,48 224,34 Z';
+    mane = fig(m, '#7a5028', fp('M226,70 C240,100 270,112 300,96 C290,120 240,124 222,96 Z', '#3e2612', .8, SOFT) + fp('M240,0 C262,-14 292,-10 308,6 C288,0 262,2 244,14 Z', '#a8743c', .7, SOFT) +
+      fl('M232,30 c6,10 6,24 2,38 M244,8 c4,10 2,22 -2,34 M300,84 c-6,10 -14,16 -24,20 M236,84 c6,10 14,16 24,18', 1, '#2e1a0a', .6));
+  }
+  return `<ellipse cx="160" cy="186" rx="130" ry="6" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, base, inner) + mane + lionHead(4, -12, male ? '#cfa060' : '#d6aa68');
+}
+
+/* 刚出生到三周的幼崽：趴着，eyesOpen=false 时闭眼。约 120×60，脚底 y=56 */
+function cubNewborn(col = '#dcb274', eyesOpen = false){
+  const body = 'M8,50 C4,36 14,24 34,22 C52,20 66,22 76,24 C84,14 100,12 108,22 C116,32 112,46 102,50 C104,52 108,54 106,56 L20,56 C12,56 9,54 8,50 Z';
+  const inner = fp('M10,46 C40,52 80,52 108,46 L108,60 L10,60 Z', '#f1dfb6', .8, SOFT) + fp('M6,44 C8,32 18,26 30,24 C20,34 20,46 26,54 Z', '#b98f55', .5, SOFT) +
+    spotsIn([[22,34],[32,30],[42,36],[52,30],[62,36],[36,44],[54,44],[70,42],[84,22,.7],[92,20,.7]], 2.4, '#9b6c38', .5) + fl('M74,26 C72,36 76,46 84,52', .9, INK, .45);
+  const face = (eyesOpen ? `<ellipse cx="98" cy="30" rx="2.4" ry="2.8" fill="#35485a"/><circle cx="98.8" cy="29" r=".8" fill="#fff"/>` : fl('M94,31 C96,33 100,33 102,31', 1.2)) +
+    fp('M108,34 C111,33 113,35 112,37 C110,39 108,38 107,37 Z', '#7a4a3c') + fl('M110,39 C108,42 105,43 102,42', .9);
+  const ears = `<circle cx="84" cy="15" r="5.5" fill="#8a6234" stroke="${INK}" stroke-width="1.1"/><circle cx="100" cy="13" r="5" fill="#8a6234" stroke="${INK}" stroke-width="1.1"/>`;
+  return `<ellipse cx="58" cy="56" rx="52" ry="3" fill="${INK}" opacity=".14" ${SOFT}/>` + fl('M10,48 C0,46 -2,54 6,56', 4, INK) + fl('M10,48 C0,46 -2,54 6,56', 2.6, col) + ears + fig(body, col, inner, face);
+}
+
+/* 花豹，面朝右，约 300×150，脚底 y=145 */
+function leopard(){
+  const far = fp('M206,96 L212,138 C212,144 224,144 224,138 L226,96 Z', '#b88a42') + fl('M206,96 L212,138 C212,144 224,144 224,138 L226,96', 1.1) +
+              fp('M94,96 C102,112 106,124 106,138 C106,144 118,144 118,138 L116,98 Z', '#b88a42') + fl('M94,96 C102,112 106,124 106,138 C106,144 118,144 118,138 L116,98', 1.1);
+  const body = 'M50,70 C56,56 84,52 120,54 C156,56 184,54 204,48 C214,42 224,38 232,38 L248,66 C246,78 240,86 234,90 L238,138 C238,145 224,145 224,138 L218,102 C190,108 140,108 112,102 C108,114 106,126 106,138 C106,145 92,145 92,138 C92,120 90,106 84,96 C66,92 46,86 50,70 Z';
+  const ros = [[66,70],[80,62],[94,72],[108,62],[122,72],[136,62],[150,72],[164,62],[178,70],[192,60],[206,66],[74,84],[90,86],[106,86],[122,88],[140,86],[158,86],[176,84],[194,80],[214,78]];
+  const inner = fp('M84,96 C120,106 180,106 236,88 L240,112 L84,112 Z', '#f6ecd2', .9, SOFT) + fp('M48,72 C52,60 64,56 78,54 C66,66 66,82 74,96 Z', '#b88a42', .45, SOFT) +
+    ros.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="#c08a3a" stroke="#2e2014" stroke-width="1.6" stroke-dasharray="5 2.6" opacity=".9"/>`).join('') +
+    spotsIn([[96,116],[98,128],[228,110],[230,124],[226,96],[100,104],[232,134,.8],[96,138,.8]], 2.2, '#2e2014', .8);
+  const head = 'M226,44 C224,30 236,20 250,20 C262,20 270,28 272,36 C280,40 286,46 286,52 C286,58 280,62 274,62 C266,68 252,68 242,64 C232,60 227,52 226,44 Z';
+  const headInner = fp('M256,50 C266,46 282,48 288,54 C284,66 266,68 256,64 Z', '#f6ecd2', .95, SOFT) + spotsIn([[236,34],[244,28],[252,30],[240,42],[234,48],[246,38],[258,26]], 1.5, '#2e2014', .8);
+  const face = `<circle cx="239" cy="22" r="6.5" fill="#2e2014" stroke="${INK}" stroke-width="1.1"/><circle cx="239.5" cy="23.5" r="3.4" fill="#e8d2a0"/>` +
+    fp('M258,38 C261,35 266,35 269,38 C266,40 261,40 258,38 Z', '#b9c46a') + `<circle cx="264" cy="37.6" r="1.6" fill="${INK}"/>` + fl('M257,37 C261,33 267,33 270,37', 1.2) +
+    fp('M281,48 C284,47 287,49 287,52 C285,54 282,54 280,52 Z', '#4a2e22') + fl('M284,55 C283,59 280,60 276,60 M280,60 C274,64 266,63 262,60', 1.1) + fl('M272,56 l13,-2 M272,58 l13,2', .6, INK, .45);
+  const t = 'M52,72 C24,70 8,90 14,114 C16,124 26,128 32,120';
+  const tail = fl(t, 8, INK) + fl(t, 6.2, '#d2a04e') + `<path d="${t}" fill="none" stroke="#2e2014" stroke-width="6.2" stroke-dasharray="3 7" opacity=".8"/>` + fl('M24,126 C28,126 31,123 32,120', 6.4, '#2e2014');
+  return `<ellipse cx="150" cy="146" rx="110" ry="5" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, '#d6a550', inner) + fig(head, '#d6a550', headInner, face);
+}
+
+/* 黑背胡狼，面朝右，约 205×150，脚底 y=145 */
+function jackal(){
+  const far = fp('M128,98 L132,138 C132,143 140,143 140,138 L142,98 Z', '#a8743a') + fp('M70,100 C76,116 78,128 78,138 C78,143 86,143 86,138 L86,100 Z', '#a8743a');
+  const body = 'M40,74 C46,62 70,58 100,60 C122,62 136,58 146,50 L162,76 C160,86 156,92 152,96 L154,138 C154,144 144,144 144,138 L140,102 C124,106 96,106 80,102 C78,114 76,126 76,138 C76,144 66,144 66,138 C66,122 64,108 60,98 C48,94 36,86 40,74 Z';
+  const inner = fp('M44,66 C80,54 122,58 150,50 C150,66 110,80 58,78 Z', '#34312e', .95) + fl('M56,70 l8,-5 M70,70 l8,-6 M84,70 l8,-6 M98,70 l8,-6 M112,68 l8,-6 M126,64 l8,-6', 1.2, '#d9d6cc', .8) +
+    fp('M60,98 C90,106 130,104 156,90 L158,112 L60,112 Z', '#f0dfc0', .9, SOFT);
+  const head = 'M142,54 C140,42 150,34 160,34 C168,34 174,40 176,46 C186,50 196,56 198,60 C198,64 192,66 186,66 C178,70 164,70 154,66 C146,62 142,58 142,54 Z';
+  const face = fp('M148,42 L144,14 L160,34 Z', '#c98f4e', 1, `stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"`) + fp('M160,36 L166,12 L173,40 Z', '#c98f4e', 1, `stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"`) + fp('M162,34 L166,20 L170,36 Z', '#f0dfc0') +
+    `<ellipse cx="172" cy="48" rx="2.2" ry="1.8" fill="${INK}"/>` + fp('M194,57 C197,56 199,58 199,60 C197,62 195,62 193,60 Z', '#1e140c') + fl('M196,63 C190,66 182,66 176,63', 1);
+  const t = 'M42,76 C30,86 24,104 28,124';
+  return `<ellipse cx="100" cy="146" rx="78" ry="4" fill="${INK}" opacity=".14" ${SOFT}/>` + far + fl(t, 12, INK) + fl(t, 10, '#c98f4e') + fl('M27,112 C27,118 27,122 28,126', 10.4, '#2a2420') +
+    fig(body, '#c98f4e', inner) + fig(head, '#c98f4e', fp('M168,56 C178,54 194,58 200,62 C194,70 176,70 166,66 Z', '#f0dfc0', .9, SOFT), face);
+}
+
+/* 东非狒狒（坐着），面朝右，约 150×160，脚底 y=155 */
+function baboon(){
+  const body = 'M30,150 C20,120 24,84 50,62 C62,50 80,46 94,52 L106,84 C110,100 106,112 100,120 C110,126 120,136 122,148 C122,154 110,155 104,152 C90,153 60,154 30,150 Z';
+  const inner = fp('M24,130 C28,96 44,70 66,58 C50,84 46,120 56,152 Z', '#5a5236', .5, SOFT) + fp('M84,90 C96,96 102,110 98,122 C90,120 82,108 84,90 Z', '#b4aa84', .6, SOFT) +
+    fl('M40,90 l5,8 M52,78 l5,8 M48,108 l5,8 M62,96 l5,8 M60,120 l5,8 M72,70 l5,8 M76,112 l5,8 M40,126 l5,8', 1, '#4a4228', .55) +
+    fl('M62,150 C64,130 82,118 100,122', 1.2, INK, .55);
+  const arm = fl('M86,78 C92,98 98,112 110,130', 12, INK) + fl('M86,78 C92,98 98,112 110,130', 10, '#857a58') + `<ellipse cx="112" cy="134" rx="6" ry="4" fill="#3a3226"/>`;
+  const head = 'M78,44 C74,28 86,16 100,16 C112,16 120,24 122,34 C132,38 142,44 144,52 C144,58 138,62 130,62 C120,66 104,66 94,60 C84,56 79,50 78,44 Z';
+  const headInner = fp('M112,40 C124,38 140,44 146,52 C144,62 126,66 112,60 Z', '#4a4038', .95) + fp('M76,44 C78,30 88,20 100,18 C90,28 88,44 96,58 Z', '#a69c78', .5, SOFT);
+  const face = fl('M104,34 C110,30 118,30 122,34', 2.2, '#3a3226') + `<circle cx="113" cy="37" r="1.7" fill="#1e140c"/>` + `<ellipse cx="140" cy="50" rx="2" ry="1.4" fill="#1e140c"/>` + fl('M141,57 C134,60 124,60 116,56', 1, '#1e140c') +
+    `<ellipse cx="90" cy="36" rx="3.4" ry="5" fill="#5a4e3a" stroke="${INK}" stroke-width="1"/>`;
+  const t = 'M30,146 C14,140 6,118 14,102 C18,94 26,98 24,106';
+  return `<ellipse cx="74" cy="154" rx="56" ry="4" fill="${INK}" opacity=".14" ${SOFT}/>` + fl(t, 6, INK) + fl(t, 4.2, '#857a58') + fig(body, '#857a58', inner) + arm + fig(head, '#8f8460', headInner, face);
+}
+
+/* 非洲草原象，面朝右，约 350×270，脚底 y=262 */
+function elephant(){
+  const far = fp('M150,168 L152,254 C152,262 180,262 180,254 L180,170 Z', '#6e665e') + fl('M150,168 L152,254 C152,262 180,262 180,254 L180,170', 1.2) +
+              fp('M216,166 L220,254 C220,262 248,262 248,254 L250,164 Z', '#6e665e') + fl('M216,166 L220,254 C220,262 248,262 248,254 L250,164', 1.2);
+  const body = 'M40,120 C36,70 80,40 150,38 C190,36 220,42 240,52 C256,36 286,34 304,50 C320,64 322,88 316,108 C314,130 312,160 316,190 C318,206 326,214 334,216 C340,218 340,226 332,226 C316,228 304,214 300,194 L296,150 C290,150 284,152 280,156 L280,254 C280,262 250,262 250,254 L250,170 C220,176 170,178 130,172 L128,254 C128,262 98,262 98,254 L96,168 C84,166 76,160 70,154 L70,254 C70,262 44,262 44,254 C40,210 40,160 40,120 Z';
+  const inner = fp('M40,150 C80,172 200,180 300,150 L300,270 L40,270 Z', '#6e665e', .45, SOFT) + fp('M60,60 C110,40 190,38 236,54 C190,60 110,66 66,86 Z', '#b9b0a4', .65, SOFT) + fp('M36,120 C38,90 50,70 68,58 C54,90 54,130 64,160 Z', '#6e665e', .5, SOFT) +
+    fl('M302,120 l10,-1 M302,132 l10,-1 M302,144 l10,0 M303,156 l10,0 M304,168 l10,1 M306,180 l10,2 M252,216 l26,0 M252,228 l26,0 M100,216 l26,0 M100,228 l26,0 M46,220 l22,0 M46,232 l22,0', .9, INK, .4) +
+    fl('M96,168 C92,140 100,116 120,104', 1.1, INK, .4) + fl('M254,256 l0,-6 M264,257 l0,-6 M274,256 l0,-6 M102,256 l0,-6 M112,257 l0,-6 M122,256 l0,-6', .9, INK, .5) +
+    fl('M90,80 C120,70 160,70 190,80 M80,110 C100,104 120,104 140,110', .8, INK, .25);
+  const earD = 'M238,56 C214,50 194,76 198,110 C202,142 222,156 246,148 C260,128 260,84 238,56 Z';
+  const ear = fig(earD, '#8f867c', fp('M200,104 C206,136 226,152 246,146 C232,140 220,124 216,100 Z', '#6e665e', .5, SOFT) + fl('M214,76 C208,96 210,120 222,138 M228,66 C222,90 224,118 234,140', .8, INK, .3));
+  const tusk = fl('M290,146 C296,164 312,174 332,168', 7, INK) + fl('M290,146 C296,164 312,174 332,168', 5, '#f4ecd8');
+  const eye = `<circle cx="284" cy="88" r="2.6" fill="#1e140c"/>` + fl('M278,84 C282,81 287,81 290,84', 1, INK, .6);
+  const tail = fl('M40,122 C30,140 30,172 36,192', 4.5, INK) + fl('M40,122 C30,140 30,172 36,192', 3, '#8f867c') + fl('M36,190 l-2,12 M36,190 l2,12', 1.4);
+  return `<ellipse cx="180" cy="263" rx="150" ry="7" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, '#9a9086', inner, eye) + ear + tusk;
+}
+
+/* 非洲水牛，面朝右，约 300×190，脚底 y=185 */
+function buffalo(){
+  const far = fp('M196,120 L200,178 C200,184 216,184 216,178 L218,120 Z', '#2e2620') + fp('M112,122 L116,178 C116,184 132,184 132,178 L132,124 Z', '#2e2620');
+  const body = 'M40,70 C44,52 80,44 130,46 C170,46 200,40 222,44 C240,48 252,60 256,76 L262,100 C262,112 254,118 246,118 L248,178 C248,185 230,185 230,178 L226,126 C200,134 150,136 110,130 L108,178 C108,185 90,185 90,178 L88,126 C70,122 52,112 44,98 C40,90 38,78 40,70 Z';
+  const inner = fp('M44,100 C100,130 200,134 262,104 L262,190 L44,190 Z', '#2e2620', .5, SOFT) + fp('M60,56 C110,44 180,44 226,46 C180,56 110,60 70,72 Z', '#74665a', .7, SOFT) + fp('M38,72 C42,58 54,52 70,48 C56,62 54,88 64,112 Z', '#2e2620', .5, SOFT) +
+    fl('M88,126 C84,106 92,88 110,80 M226,126 C222,108 226,92 236,84', 1.1, '#1e1814', .5);
+  const head = 'M234,58 C250,52 270,58 278,72 C286,86 288,106 284,120 C282,130 270,134 262,128 C250,122 238,106 234,86 C232,76 232,64 234,58 Z';
+  const headInner = fp('M262,104 C274,100 288,108 288,120 C284,134 268,134 260,126 Z', '#1e1814', .9, SOFT) + fp('M236,60 C250,54 266,58 274,68 C262,64 250,66 240,74 Z', '#74665a', .6, SOFT);
+  const hornA = 'M252,58 C236,40 206,46 204,68 C204,80 214,86 224,80', hornB = 'M262,56 C282,40 310,50 308,72 C306,82 298,86 290,80';
+  const horns = fl(hornA, 9.5, INK) + fl(hornA, 7.5, '#3a322c') + fl(hornB, 9.5, INK) + fl(hornB, 7.5, '#3a322c') + fp('M244,58 C250,48 266,48 272,58 C266,64 250,64 244,58 Z', '#4a4038', 1, `stroke="${INK}" stroke-width="1.2"`) +
+    fl('M210,62 C212,54 220,50 230,50 M300,62 C298,54 292,50 284,50', 1.2, '#8a7c6e', .7);
+  const face = `<ellipse cx="238" cy="80" rx="8" ry="4.5" fill="#3a322c" stroke="${INK}" stroke-width="1.1" transform="rotate(24 238 80)"/>` + `<circle cx="266" cy="82" r="2.2" fill="#f2ead6"/><circle cx="266.4" cy="82" r="1.2" fill="#140e0a"/>` + `<ellipse cx="278" cy="120" rx="2.4" ry="1.6" fill="#0e0a08"/>` + fl('M268,128 C274,130 280,128 284,124', 1, '#0e0a08');
+  const tail = fl('M40,72 C30,90 30,116 34,134', 4, INK) + fl('M40,72 C30,90 30,116 34,134', 2.6, '#4e4237') + `<ellipse cx="34.5" cy="140" rx="3.6" ry="7" fill="#1e1814"/>`;
+  return `<ellipse cx="160" cy="186" rx="126" ry="6" fill="${INK}" opacity=".16" ${SOFT}/>` + far + tail + fig(body, '#52463c', inner) + fig(head, '#4a3e36', headInner, face) + horns;
+}
+
+/* 河马，面朝右，约 330×180，脚底 y=175 */
+function hippo(){
+  const far = fp('M196,136 L198,168 C198,174 222,174 222,168 L224,134 Z', '#6e5e5c') + fp('M108,136 L110,168 C110,174 134,174 134,168 L134,138 Z', '#6e5e5c');
+  const body = 'M30,90 C30,50 80,36 150,38 C200,38 232,44 250,56 C268,48 292,52 306,66 C320,80 322,100 314,112 C306,122 290,124 276,120 C270,124 262,126 256,126 L256,168 C256,175 228,175 228,168 L228,138 C196,144 130,144 104,140 L102,168 C102,175 74,175 74,168 L72,136 C48,130 30,112 30,90 Z';
+  const inner = fp('M40,112 C100,140 200,144 262,120 C280,128 304,124 318,108 L320,180 L40,180 Z', '#d2a9a2', .75, SOFT) + fp('M50,56 C100,38 190,38 246,56 C190,58 110,62 60,84 Z', '#a8989a', .6, SOFT) + fp('M28,92 C30,70 42,58 60,50 C46,70 46,100 58,124 Z', '#6e5e5c', .5, SOFT) +
+    fl('M238,62 C232,80 234,104 246,122', 1.1, INK, .4) + fl('M72,136 C68,118 74,102 88,94 M228,138 C226,124 228,112 236,104', 1, INK, .4) + fl('M78,170 l0,-5 M88,171 l0,-5 M98,170 l0,-5 M232,170 l0,-5 M242,171 l0,-5 M252,170 l0,-5', .8, INK, .5);
+  const face = `<ellipse cx="262" cy="50" rx="5" ry="6.5" fill="#8f7e7a" stroke="${INK}" stroke-width="1.2" transform="rotate(-20 262 50)"/>` + `<circle cx="282" cy="66" r="2.6" fill="#1e140c"/>` + fl('M277,62 C280,59 285,59 288,62', 1, INK, .6) +
+    `<ellipse cx="308" cy="78" rx="2.6" ry="1.8" fill="#3a2a26"/>` + fl('M314,108 C302,116 284,114 270,104', 1.3) + spotsIn([[296,96],[302,92],[304,100],[290,100]], 1, INK, .45);
+  const tail = fl('M30,88 C24,96 24,106 28,114', 4, INK) + fl('M30,88 C24,96 24,106 28,114', 2.6, '#8f7e7a');
+  return `<ellipse cx="170" cy="176" rx="140" ry="6" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, '#9a8886', inner, face);
+}
+
+/* 汤氏瞪羚，面朝右，约 190×235，脚底 y=230 */
+function gazelle(){
+  const far = fp('M122,140 L126,224 C126,229 132,229 132,224 L132,140 Z', '#b07a3c') + fp('M70,142 C74,170 74,200 74,224 C74,229 80,229 80,224 L80,142 Z', '#b07a3c');
+  const body = 'M40,119 C44,107 66,101 96,103 C116,103 126,97 130,85 C134,69 140,57 146,51 L162,61 C158,77 154,97 152,113 C150,123 146,129 142,133 L144,224 C144,230 136,230 136,224 L130,145 C112,151 86,151 70,145 C68,167 66,197 66,224 C66,230 58,230 58,224 C58,197 56,167 50,143 C42,139 38,127 40,119 Z';
+  const inner = fp('M52,138 C80,152 120,150 148,130 L150,160 L52,160 Z', '#fbf4e2', .95) + fp('M58,126 C88,118 120,120 142,114 C126,134 86,138 62,134 Z', '#2e241a', .92) + fp('M40,120 C44,110 54,106 64,104 C54,112 52,126 56,138 Z', '#b07a3c', .5, SOFT);
+  const head = 'M142,55 C142,45 150,39 158,41 C168,43 178,51 180,57 C180,61 176,63 172,63 C164,65 152,65 146,61 Z';
+  const face = fl('M152,41 C147,25 151,13 157,5', 3.4, INK) + fl('M152,41 C147,25 151,13 157,5', 2, '#4a3a2a') + fl('M158,41 C158,25 164,15 170,9', 3.4, INK) + fl('M158,41 C158,25 164,15 170,9', 2, '#4a3a2a') +
+    fp('M144,45 L134,37 L146,51 Z', '#c98f4e', 1, `stroke="${INK}" stroke-width="1" stroke-linejoin="round"`) + `<ellipse cx="160" cy="50" rx="2.2" ry="2.4" fill="#1e140c"/>` + fl('M162,53 C168,56 174,58 178,58', 1.6, '#2e241a', .8) + `<ellipse cx="179" cy="58" rx="1.6" ry="1.2" fill="#1e140c"/>`;
+  const tail = fl('M40,120 C34,126 34,134 36,140', 3.6, '#2e241a');
+  return `<ellipse cx="98" cy="231" rx="66" ry="4" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, '#d09a52', inner) + fig(head, '#d09a52', fp('M162,56 C170,56 178,58 182,60 C176,66 164,66 158,62 Z', '#fbf4e2', .9), face);
+}
+
+/* 瘤牛，面朝右，约 260×180，脚底 y=175 */
+function zebu(col = '#8a6a48', patch = '#efe4cc'){
+  const far = fp('M168,118 L172,168 C172,174 186,174 186,168 L188,116 Z', '#5a4630') + fp('M88,118 L92,168 C92,174 106,174 106,168 L106,120 Z', '#5a4630');
+  const body = 'M36,80 C38,62 70,54 110,56 C130,56 142,38 160,36 C174,36 180,50 184,58 C196,58 208,62 214,72 L222,96 C220,106 212,110 206,108 L208,168 C208,175 192,175 192,168 L188,120 C160,128 110,128 84,122 L82,168 C82,175 66,175 66,168 L64,118 C48,112 34,96 36,80 Z';
+  const inner = fp('M44,104 C90,126 170,128 220,100 L220,180 L44,180 Z', '#3a2a1a', .28, SOFT) + `<path d="M70,70 C90,60 120,66 126,82 C120,98 86,100 72,90 Z" fill="${patch}" opacity=".85" ${SOFT}/>` + `<path d="M150,90 C162,84 176,90 176,102 C168,112 152,108 150,90 Z" fill="${patch}" opacity=".7" ${SOFT}/>` +
+    fl('M198,104 C194,116 188,122 180,122', 1.1, INK, .5) + fl('M64,118 C60,102 66,88 80,80', 1, INK, .4);
+  const head = 'M204,60 C216,56 232,62 240,74 C246,84 248,96 244,102 C238,108 228,106 222,100 C212,94 204,80 204,60 Z';
+  const face = fl('M214,60 C210,46 216,34 226,28', 6, INK) + fl('M214,60 C210,46 216,34 226,28', 4, '#efe4cc') + fl('M224,60 C226,48 234,40 244,38', 6, INK) + fl('M224,60 C226,48 234,40 244,38', 4, '#efe4cc') +
+    `<ellipse cx="206" cy="70" rx="7" ry="3.6" fill="${col}" stroke="${INK}" stroke-width="1" transform="rotate(30 206 70)"/>` + `<circle cx="228" cy="76" r="1.9" fill="#1e140c"/>` + `<ellipse cx="243" cy="98" rx="1.8" ry="1.3" fill="#1e140c"/>` + fl('M236,104 C240,104 243,103 245,101', .9);
+  const tail = fl('M36,82 C28,98 28,122 32,140', 3.6, INK) + fl('M36,82 C28,98 28,122 32,140', 2.2, col) + `<ellipse cx="32.5" cy="146" rx="3" ry="6" fill="#2a1e14"/>`;
+  return `<ellipse cx="130" cy="176" rx="100" ry="5" fill="${INK}" opacity=".14" ${SOFT}/>` + far + tail + fig(body, col, inner) + fig(head, col, fp('M226,90 C236,88 248,94 248,100 C242,110 230,108 224,102 Z', '#3a2a1a', .35, SOFT), face);
+}
+
+/* 放牧人，约 70×200，脚底 y=195 */
+function herder(){
+  const cloak = 'M14,190 L18,74 C10,66 12,48 24,44 L44,44 C56,48 58,66 50,74 L56,190 Z';
+  const inner = fp('M14,190 L18,100 C28,120 30,160 26,192 Z', '#5a1e16', .5, SOFT) + fl('M22,80 C30,100 32,150 30,190 M40,78 C44,110 46,150 46,190', 1, '#5a1e16', .6) + fl('M18,110 l34,6 M17,140 l37,6 M16,168 l39,6', 1.4, '#2a2a4a', .5);
+  return `<ellipse cx="36" cy="194" rx="30" ry="4" fill="${INK}" opacity=".14" ${SOFT}/>` + fl('M62,54 L70,194', 2.2, '#5a4630') + fig(cloak, '#9c3a2a', inner) +
+    `<circle cx="34" cy="28" r="13" fill="#4a3020" stroke="${INK}" stroke-width="1.4"/>` + fl('M22,42 C30,48 40,48 46,42', 3, '#d9c08a') + fp('M10,186 L24,186 L24,196 L8,196 Z M44,186 L58,186 L60,196 L44,196 Z', '#3a2a1a');
+}
+
+/* 蛇：粗线条 + 花纹 */
+function snakeLine(d, w, col, pat, dash, headD, headCol, extra = ''){
+  return fl(d, w + 2, INK) + fl(d, w, col) + (pat ? `<path d="${d}" fill="none" stroke="${pat}" stroke-width="${w * .72}" stroke-dasharray="${dash}" stroke-linecap="butt" opacity=".85"/>` : '') + fp(headD, headCol, 1, `stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"`) + extra;
+}
+/* 非洲岩蟒（盘着），约 190×90，脚底 y=86 */
+function python(){
+  const d = 'M14,70 C6,40 70,22 120,28 C160,34 164,72 110,78 C60,82 40,62 62,50 C84,40 120,44 122,58 C122,66 96,66 92,60 C100,48 130,40 150,34 C160,30 168,28 174,28';
+  return `<ellipse cx="90" cy="84" rx="84" ry="5" fill="${INK}" opacity=".14" ${SOFT}/>` + snakeLine(d, 15, '#b59a62', '#4e3c20', '9 8', 'M168,20 C178,16 192,20 194,28 C192,36 178,38 168,36 Z', '#9a8050', `<circle cx="184" cy="25" r="1.6" fill="${INK}"/>` + fl('M194,29 l6,-2 M194,29 l6,2', .9, '#9c4a2a') + fl('M170,22 C176,24 182,24 188,22', 1.4, '#4e3c20', .7));
+}
+/* 鼓腹蝰蛇，约 150×44，脚底 y=40 */
+function puffAdder(){
+  const d = 'M10,30 C30,14 54,14 70,26 C86,38 106,36 118,26';
+  return `<ellipse cx="72" cy="38" rx="66" ry="3.5" fill="${INK}" opacity=".14" ${SOFT}/>` + snakeLine(d, 16, '#b8975e', '#3e2e18', '3 7', 'M112,14 C126,8 144,14 146,24 C144,34 126,38 112,34 Z', '#a8854e', `<circle cx="134" cy="19" r="1.6" fill="${INK}"/>` + fl('M118,20 C124,24 130,24 136,28', 1.4, '#3e2e18', .7)) +
+    `<path d="${d}" fill="none" stroke="#e8d8b0" stroke-width="2" stroke-dasharray="1 9" stroke-dashoffset="5" opacity=".8"/>`;
+}
+/* 黑颈喷毒眼镜蛇（立起，颈部无眼镜纹），约 120×130，脚底 y=126 */
+function cobra(){
+  const coil = 'M100,112 C104,96 30,92 22,108 C16,120 60,124 82,118';
+  const hood = 'M60,112 C52,90 44,62 46,40 C48,20 58,8 70,8 C82,8 92,20 94,40 C96,62 88,90 80,112 Z';
+  const inner = fp('M56,60 C64,66 76,66 86,60 L84,74 C76,78 66,78 58,74 Z', '#c98a7a', .8) + fp('M58,84 C66,88 74,88 82,84 L80,94 C74,96 66,96 60,94 Z', '#c98a7a', .5) + fp('M46,40 C48,24 56,12 66,9 C58,22 56,60 62,110 Z', '#14100e', .5, SOFT);
+  return `<ellipse cx="62" cy="124" rx="52" ry="4" fill="${INK}" opacity=".14" ${SOFT}/>` + fl(coil, 13, INK) + fl(coil, 11, '#2e2a28') + fig(hood, '#2e2a28', inner, fp('M60,14 C64,6 76,6 80,14 C80,24 76,30 70,32 C64,30 60,24 60,14 Z', '#3a3634', 1, `stroke="${INK}" stroke-width="1.1"`) + `<circle cx="64" cy="17" r="1.5" fill="#d9c08a"/><circle cx="76" cy="17" r="1.5" fill="#d9c08a"/>` + fl('M70,32 l-2,7 M70,32 l2,7', .9, '#9c4a2a'));
+}
+/* 黑曼巴，约 230×60，脚底 y=56 */
+function mamba(){
+  const d = 'M8,46 C30,24 56,52 84,40 C112,28 136,52 162,38 C176,30 188,24 200,22';
+  return `<ellipse cx="110" cy="54" rx="100" ry="3.5" fill="${INK}" opacity=".14" ${SOFT}/>` + snakeLine(d, 7.5, '#7b7868', null, '', 'M196,15 C206,12 222,16 226,22 C222,28 206,30 196,28 Z', '#6e6b5c', `<circle cx="214" cy="19" r="1.4" fill="${INK}"/>` + fl('M204,25 C212,26 220,25 225,22', 1, '#14100e')) +
+    `<path d="${d}" fill="none" stroke="#c9c6b4" stroke-width="1.6" opacity=".6" transform="translate(0,2.4)"/>`;
+}
+
+/* 猛雕（展翅），约 300×150 */
+function eagle(){
+  const wing = (d) => fp(d, '#5a4634', 1, `stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"`);
+  const wl = 'M150,60 C120,30 70,14 14,22 L26,34 L8,40 L24,50 L10,60 L30,66 L22,78 L46,78 L44,90 L70,84 L74,96 C104,96 130,84 150,74 Z';
+  const wr = 'M150,60 C180,30 230,14 286,22 L274,34 L292,40 L276,50 L290,60 L270,66 L278,78 L254,78 L256,90 L230,84 L226,96 C196,96 170,84 150,74 Z';
+  const body = 'M136,58 C136,44 146,36 152,36 C160,36 166,44 166,58 C168,84 162,108 152,120 C142,108 134,84 136,58 Z';
+  return wing(wl) + wing(wr) + fl('M30,40 C70,36 110,46 140,62 M270,40 C230,36 190,46 160,62', 1, '#2e2218', .6) + fl('M50,62 l4,-10 M70,66 l4,-10 M92,72 l4,-10 M250,62 l-4,-10 M230,66 l-4,-10 M208,72 l-4,-10', 1, '#c9b08a', .7) +
+    fp('M140,112 L132,140 L144,134 L152,144 L160,134 L172,140 L164,112 Z', '#5a4634', 1, `stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"`) +
+    fig(body, '#f4ecd8', fp('M134,40 C146,34 160,34 168,40 L168,66 C158,60 146,60 136,66 Z', '#5a4634', 1) + spotsIn([[144,78],[152,74],[160,80],[148,90],[156,92],[152,104],[146,100],[158,102]], 1.8, '#3e2e1c', .8),
+      fp('M152,40 C156,38 160,40 160,44 C158,48 154,48 152,46 Z', '#d9a82e', 1, `stroke="${INK}" stroke-width=".9"`) + `<circle cx="146" cy="44" r="1.6" fill="#d9a82e" stroke="${INK}" stroke-width=".8"/>` + fl('M142,120 l-3,10 M162,120 l3,10', 2, '#d9a82e'));
+}
+
+const ART = {
+  lionessLying:{ w:370, base:170, H:.5,  face:'R', draw:lionessLying },
+  lioness:     { w:340, base:185, H:.64, face:'R', draw:() => lionStanding(false) },
+  male:        { w:340, base:185, H:.78, face:'R', draw:() => lionStanding(true) },
+  cub:         { w:195, base:138, H:.19, face:'R', draw:cubStanding },
+  newborn:     { w:118, base:56,  H:.085,face:'R', draw:cubNewborn },
+  hyena:       { w:256, base:158, H:.44, face:'L', draw:hyena },
+  leopard:     { w:292, base:145, H:.36, face:'R', draw:leopard },
+  jackal:      { w:204, base:145, H:.26, face:'R', draw:jackal },
+  baboon:      { w:150, base:154, H:.42, face:'R', draw:baboon },
+  elephant:    { w:345, base:262, H:1.85,face:'R', draw:elephant },
+  buffalo:     { w:312, base:185, H:1.0, face:'R', draw:buffalo },
+  hippo:       { w:326, base:175, H:.9,  face:'R', draw:hippo },
+  gazelle:     { w:190, base:230, H:.5,  face:'R', draw:gazelle },
+  zebu:        { w:252, base:175, H:.82, face:'R', draw:zebu },
+  herder:      { w:74,  base:195, H:.95, face:'R', draw:herder },
+  python:      { w:202, base:86,  H:.2,  face:'R', draw:python },
+  puff:        { w:150, base:40,  H:.07, face:'R', draw:puffAdder },
+  cobra:       { w:120, base:126, H:.2,  face:'R', draw:cobra },
+  mamba:       { w:230, base:56,  H:.1,  face:'R', draw:mamba },
+  eagle:       { w:300, base:146, H:.5,  face:'R', draw:eagle }
+};
+function vultureFly(x, y, s=1){ return G(x,y,s,false, ln('M0,0 c6,-4 12,-4 16,0 c4,-4 10,-4 16,0',1.6)); }
+function vultureDead(x, y, s=1){
+  return G(x,y,s,false, shp('M0,0 C2,-6 12,-8 20,-6 C28,-4 32,-2 34,0 Z','#5a5044') + ln('M20,-6 C26,-14 36,-14 40,-8 M8,-4 C2,-10 -6,-10 -10,-4',1.4,'#3e362c') + ln('M34,0 c3,-2 6,-2 8,0',1.2,'#c9b09a'));
+}
+function vultureDead(x, y, s=1){
+  return G(x,y,s,false, shp('M0,0 C2,-6 12,-8 20,-6 C28,-4 32,-2 34,0 Z','#5a5044') + ln('M20,-6 C26,-14 36,-14 40,-8 M8,-4 C2,-10 -6,-10 -10,-4',1.4,'#3e362c') + ln('M34,0 c3,-2 6,-2 8,0',1.2,'#c9b09a'));
+}
+function warthogCarcass(x, y, s=1){
+  return G(x,y,s,false, shp('M0,0 C0,-10 14,-14 30,-13 C40,-13 46,-10 48,-6 C52,-6 56,-4 56,0 Z','#7a5a48') + ln('M50,-6 c3,-3 6,-3 7,-6',1.6,'#efe6d0') + ln('M14,-10 l2,3 M20,-11 l2,3',.7,'#9c4a2a',.8));
+}
+function snareWire(x, y, s=1){
+  return G(x,y,s,false, `<ellipse cx="0" cy="-10" rx="9" ry="10" fill="none" stroke="#7a7a7a" stroke-width="1.6" vector-effect="non-scaling-stroke"/>` + ln('M9,-12 C18,-16 24,-26 28,-34',1.3,'#7a7a7a') + ln('M28,-34 l2,-4',2,'#5a4630'));
+}
+
+/* 把手绘动物放进场景：cx 为中心，by 为脚底；大小按体型表和远近自动算 */
+let _pt = { top:1e9, x0:1e9, x1:-1e9, h:0 };
+function art(name, cx, by, dir = 'R', mul = 1, args = []){
+  const a = ART[name]; const hpx = 105 * a.H * depthF(by) * mul, k = hpx / a.base, w = a.w * k, flip = dir !== a.face;
+  _pt.top = Math.min(_pt.top, by - hpx); _pt.x0 = Math.min(_pt.x0, cx - w/2); _pt.x1 = Math.max(_pt.x1, cx + w/2); _pt.h = hpx;
+  return `<g transform="translate(${(flip ? cx + w/2 : cx - w/2).toFixed(1)},${(by - hpx).toFixed(1)}) scale(${(flip ? -k : k).toFixed(4)},${k.toFixed(4)})">${a.draw(...args)}</g>`;
+}
+/* 半浸在水里：只露出上半身 */
+function artWater(name, cx, by, dir, sunk, cid){
+  const a = ART[name]; const hpx = 105 * a.H * depthF(by), w = a.w * hpx / a.base, wl = by - hpx * sunk;
+  return `<clipPath id="${cid}cw"><rect x="${(cx - w/2 - 6).toFixed(1)}" y="${(by - hpx - 6).toFixed(1)}" width="${(w + 12).toFixed(1)}" height="${(wl - by + hpx + 6).toFixed(1)}"/></clipPath><g clip-path="url(#${cid}cw)">${art(name, cx, by, dir)}</g>` +
+    `<ellipse cx="${cx}" cy="${wl + 2}" rx="${(w * .5).toFixed(1)}" ry="3" fill="#3a2a1a" opacity=".18"/>` + ln(`M${(cx - w/2 - 8).toFixed(1)} ${wl + 1} q${(w/6).toFixed(1)},-3 ${(w/3).toFixed(1)},0 t${(w/3).toFixed(1)},0 t${(w/3).toFixed(1)},0`, 1.1, '#f4f1e2', .7);
+}
+const herd = list => [...list].sort((p, q) => p[2] - q[2]).map(p => art(...p)).join('');
+
+/* ---------- 植被与地形 ---------- */
+function crotonThicket(cx, by, w, h, seed=1){
+  let g = '';
+  const cols = ['#7d8a5a','#94a074','#56632e','#6b7a44','#a3ad84'];
+  const n = Math.round(w / 6);
+  for (let i = 0; i < n; i++){
+    const t = (i * 0.6180339 * seed) % 1, u = ((i*0.381966*seed*1.7) % 1);
+    const px = cx + (t - .5) * w, dome = Math.sqrt(Math.max(0, 1 - Math.pow((px - cx)/(w/2), 2)));
+    const py = by - u * h * dome - 4;
+    g += `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${(5+u*4).toFixed(1)}" ry="${(3.4+u*2).toFixed(1)}" fill="${cols[i%5]}" opacity=".9" transform="rotate(${(t*60-30).toFixed(0)} ${px.toFixed(1)} ${py.toFixed(1)})"/>`;
+  }
+  g += `<path d="M${cx-w/2} ${by} Q${cx} ${by-h*1.1} ${cx+w/2} ${by}" fill="none" stroke="${INK}" stroke-width="1" opacity=".55" filter="url(#ink)"/>`;
+  for (let i = 0; i < 6; i++){ const px = cx + (i/5 - .5) * w * .8; g += ln(`M${px} ${by} q${(i%2?3:-3)} -${h*.3} ${(i%2?6:-6)} -${h*.45}`, .8, '#4a3420', .6); }
+  return g;
+}
+function reeds(x0, x1, by){
+  let g = ''; for (let x = x0; x < x1; x += 5){ const h = 10 + (x*7 % 13); g += ln(`M${x} ${by} q${x%2?2:-2} -${h/2} ${x%2?3:-1} -${h}`, .9, '#5f6f34', .8); } return g;
+}
+function grassTufts(n, y0, y1){
+  let g = ''; for (let i = 0; i < n; i++){ const x = (i * 73 + 17) % 640, y = y0 + ((i * 37) % (y1 - y0)); g += ln(`M${x} ${y} l-2,-6 M${x} ${y} l0,-8 M${x} ${y} l3,-6`, .7, '#6b5538', .55); } return g;
+}
+function sausageTree(x, by){
+  let g = ln(`M${x} ${by} C${x-4} ${by-40} ${x+2} ${by-80} ${x-2} ${by-104}`, 9, '#5a4028') + ln(`M${x} ${by} C${x-4} ${by-40} ${x+2} ${by-80} ${x-2} ${by-104}`, 1, INK, .6);
+  g += ln(`M${x-2} ${by-96} q-30 -16 -66 -10 M${x-1} ${by-100} q30 -20 70 -14`, 4.5, '#5a4028');
+  for (let i = 0; i < 14; i++){ const t = i/13, px = x - 90 + t*180, py = by - 118 - Math.sin(t*Math.PI)*18 + (i%3)*4;
+    g += `<ellipse cx="${px}" cy="${py}" rx="${18 - (i%3)*3}" ry="${10 - (i%2)*2}" fill="${['#5f6f34','#6b7a3c','#4f5e2a'][i%3]}" opacity=".88" filter="url(#wc)"/>`; }
+  g += `<path d="M${x-96} ${by-112} Q${x} ${by-150} ${x+96} ${by-112}" fill="none" stroke="${INK}" stroke-width=".9" opacity=".45" filter="url(#ink)"/>`;
+  [[-40,8],[-22,14],[6,10],[28,16],[48,9]].forEach(([dx,l]) => { g += ln(`M${x+dx} ${by-106} v${l*2}`, .7) + `<ellipse cx="${x+dx}" cy="${by-106+l*2+8}" rx="3.2" ry="9" fill="#7a5a32" stroke="${INK}" stroke-width=".7"/>`; });
+  return g;
+}
+function boulders(cx, by){
+  const rock = (x,y,w,h) => shp(`M${x} ${y} C${x+w*.05} ${y-h*.8} ${x+w*.3} ${y-h} ${x+w*.55} ${y-h} C${x+w*.85} ${y-h} ${x+w} ${y-h*.6} ${x+w} ${y} Z`, '#bcae90') + ln(`M${x+w*.3} ${y-h*.7} q${w*.1} ${h*.2} ${w*.05} ${h*.5}`, .7, INK, .6) + ln(`M${x+w*.6} ${y-2} l${w*.08} -${h*.25} M${x+w*.7} ${y-2} l${w*.08} -${h*.22} M${x+w*.8} ${y-2} l${w*.07} -${h*.18}`, .6, INK, .4);
+  return rock(cx-110, by, 90, 46) + rock(cx-30, by+2, 70, 34) + rock(cx+30, by, 60, 28);
+}
+
+/* ---------- 光线 ---------- */
+const TIME_OF = { birth:'dawn', alone:'dusk', snare:'dusk', hyenas:'night', hippo:'night', nomads:'night', flood:'night', pride:'dawn', poison:'dusk' };
+const SKY = {
+  dawn:{ top:'#ead2b8', bot:'#f3e2c4', sun:'#e8a070', sunY:132, sunR:26, sunOp:.7 },
+  day: { top:'#efe2c2', bot:'#f2e7cd', sun:'#d9a35a', sunY:68,  sunR:28, sunOp:.45 },
+  dusk:{ top:'#e2b388', bot:'#efd3a8', sun:'#d4693a', sunY:138, sunR:30, sunOp:.75 },
+  night:{ top:'#4d5470', bot:'#7b7d88', sun:'#f6efd8', sunY:62, sunR:16, sunOp:.95 }
+};
+
+/* ---------- 场景 ---------- */
+/* 透视：by 越靠下（越近）越大。55 像素 ≈ 1 米（在 by=270 处） */
+const depthF = by => clamp(0.62 + (by - 210) / 60 * 0.38, .55, 1.08);
+function crotonFront(cx, by, w, h, seed=1){
+  let g = ''; const cols = ['#6b7a44','#56632e','#8b986a','#7d8a5a'];
+  const n = Math.round(w / 4.5);
+  for (let i = 0; i < n; i++){
+    const t = (i * 0.6180339 * seed) % 1, u = ((i*0.381966*seed*2.3) % 1);
+    const px = cx + (t - .5) * w, py = by - u * h + 3;
+    g += `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${(4.5+u*3).toFixed(1)}" ry="${(2.8+u*1.6).toFixed(1)}" fill="${cols[i%4]}" opacity=".93" transform="rotate(${(t*70-35).toFixed(0)} ${px.toFixed(1)} ${py.toFixed(1)})"/>`;
+  }
+  for (let i = 0; i < 7; i++){ const px = cx + (i/6 - .5) * w * .9; g += ln(`M${px.toFixed(1)} ${by+4} q${i%2?3:-3} -${h*.5} ${i%2?5:-5} -${h*.9}`, .8, '#4a3420', .55); }
+  return g;
+}
+
+function sceneSVG(opt){
+  const id = 'sc' + (++_uid);
+  const den = opt.den || 'low', ev = opt.ev || '';
+  const time = opt.time || TIME_OF[ev] || 'day', sk = SKY[time];
+  const flood = !!opt.flood, rain = flood || opt.rain;
+  const riverY = flood ? 250 : 284;
+  const age = opt.age ?? 20, nC = opt.cubs ?? 3;
+  const sunX = time==='dusk' ? 120 : time==='dawn' ? 530 : 520;
+  const LIT = {
+    night:{ m:'.4 .12 .05 0 0  .1 .4 .08 0 .01  .1 .16 .42 0 .04  0 0 0 1 0', dx:-1.3, dy:1.3, c:'#dfe5f2', o:.6 },
+    dusk: { m:'.98 .04 0 0 .01  0 .92 0 0 0  0 0 .84 0 0  0 0 0 1 0', dx:1.4, dy:.7, c:'#ffe0b0', o:.55 },
+    dawn: { m:'1 .04 0 0 .02  0 .95 0 0 .01  0 0 .86 0 0  0 0 0 1 0', dx:-1.6, dy:.8, c:'#ffe6c8', o:.55 }
+  }[time];
+  const water = flood ? ['#9d8c62','#857448'] : ['#9db1ab','#bccac2'];
+  let s = `<svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" font-family='Noto Serif SC,serif'>
+  <defs>
+    <filter id="wc" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3.2"/><feGaussianBlur stdDeviation=".35"/></filter>
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
+    <filter id="rough"><feTurbulence baseFrequency=".035" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <filter id="wash" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="9" result="d"/><feDisplacementMap in="SourceGraphic" in2="d" scale="5" result="g"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".011 .028" numOctaves="3" seed="4" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 .36  0 0 0 0 .25  0 0 0 0 .1  0 0 0 -1.3 .78" result="blot"/>
+      <feComposite in="blot" in2="g" operator="in" result="b2"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="b2"/></feMerge></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="blur2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .3  0 0 0 0 .22  0 0 0 0 .1  0 0 0 .22 -.04"/></filter>
+    ${LIT ? `<filter id="${id}lit" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="${LIT.m}" result="c"/>
+      <feOffset in="SourceAlpha" dx="${LIT.dx}" dy="${LIT.dy}" result="o"/><feComposite in="SourceAlpha" in2="o" operator="out" result="rim"/>
+      <feFlood flood-color="${LIT.c}" flood-opacity="${LIT.o}"/><feComposite in2="rim" operator="in"/><feGaussianBlur stdDeviation=".35" result="rl"/>
+      <feMerge><feMergeNode in="c"/><feMergeNode in="rl"/></feMerge></filter>
+    <filter id="${id}tone" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${LIT.m}"/></filter>` : ''}
+    <linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk.top}"/><stop offset="1" stop-color="${sk.bot}"/></linearGradient>
+    <radialGradient id="${id}glow"><stop offset="0" stop-color="${sk.sun}" stop-opacity=".55"/><stop offset="1" stop-color="${sk.sun}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6d6ad"/><stop offset="1" stop-color="#d8c38e"/></linearGradient>
+    <linearGradient id="${id}h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfc994"/><stop offset=".7" stop-color="#d2b77e"/><stop offset="1" stop-color="#bf9f66"/></linearGradient>
+    <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${water[0]}"/><stop offset="1" stop-color="${water[1]}"/></linearGradient>
+    <pattern id="${id}rain" width="14" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><line x1="3" y1="0" x2="3" y2="9" stroke="#5a6a78" stroke-width=".8" opacity=".55"/></pattern>
+  </defs>
+  <rect width="640" height="360" fill="url(#${id}sky)"/>
+  <circle cx="${sunX}" cy="${sk.sunY}" r="${sk.sunR*3.2}" fill="url(#${id}glow)"/>
+  <circle cx="${sunX}" cy="${sk.sunY}" r="${sk.sunR}" fill="${sk.sun}" opacity="${sk.sunOp}" filter="url(#wc)"/>`;
+  if (time==='night') s += dots([[60,40],[140,70],[210,30],[300,56],[380,24],[430,80],[600,40],[250,96],[470,40],[30,96],[340,92],[580,104]], 1.1, '#f6efd8', .8);
+  else s += `<g fill="#fffaf0" opacity=".45" filter="url(#soft)"><ellipse cx="170" cy="70" rx="70" ry="9"/><ellipse cx="400" cy="100" rx="90" ry="8"/><ellipse cx="300" cy="48" rx="50" ry="6"/></g>`;
+  // 远山、丘陵、河岸平地：水彩晕染，远淡近浓
+  s += `<path d="M0 152 Q80 126 170 138 T330 124 T480 134 T640 120 V210 H0Z" fill="#aeb2a2" opacity=".5" filter="url(#wc)"/>
+  <path d="M0 168 Q90 136 180 158 T360 148 T520 140 T640 158 V360 H0Z" fill="url(#${id}h1)" filter="url(#wash)"/>
+  <path d="M0 168 Q90 136 180 158 T360 148 T520 140 T640 158" fill="none" stroke="#6b5538" stroke-width=".8" opacity=".4" filter="url(#rough)"/>
+  <g fill="#6f7c48" opacity=".5" filter="url(#wc)">${[[40,190,22,6],[130,186,30,7],[230,190,18,5],[360,184,34,7],[450,186,20,5],[520,182,26,6],[610,188,24,6]].map(([x,y,rx,ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`).join('')}</g>
+  <path d="M0 198 Q120 180 250 194 T500 188 T640 196 V360 H0Z" fill="url(#${id}h2)" filter="url(#wash)"/>`;
+  s += [[84,186,.9],[560,182,.75],[300,178,.55],[200,182,.4]].map(([x,y,k]) => G(x,y,k,false, ln('M0,0 v-20 M0,-14 q-12,-6 -22,-6 M0,-16 q10,-8 22,-8',1.1,'#4a3420',.8) + `<path d="M-26,-22 q26,-14 52,0 q-26,6 -52,0z" fill="#5f6f34" opacity=".75" filter="url(#wc)"/>`)).join('');
+  s += grassTufts(30, 208, riverY - 8);
+  // 河：湿润的岸、水色渐变、倒影和波光
+  s += `<path d="M0 ${riverY-7} Q160 ${riverY-17} 320 ${riverY-7} T640 ${riverY-11} V${riverY+8} H0Z" fill="#a8895a" opacity=".55" filter="url(#wc)"/>
+  <path d="M0 ${riverY} Q160 ${riverY-10} 320 ${riverY} T640 ${riverY-4} V360 H0Z" fill="url(#${id}w)" filter="url(#rough)"/>
+  <path d="M0 ${riverY} Q160 ${riverY-10} 320 ${riverY} T640 ${riverY-4}" fill="none" stroke="#4f625f" stroke-width="1" opacity=".55" filter="url(#rough)"/>
+  <ellipse cx="300" cy="${riverY+13}" rx="104" ry="8" fill="#4f5e3a" opacity="${flood?.18:.3}" filter="url(#soft)"/>`;
+  for (let i = 0; i < 5; i++) s += `<rect x="${sunX-16+i*3}" y="${riverY+12+i*10}" width="${32-i*5}" height="2.2" rx="1" fill="${sk.sun}" opacity="${time==='day'?.3:.6}"/>`;
+  for (let i = 0; i < 7; i++) s += ln(`M${30+i*90} ${riverY+22+(i%2)*16} q14,-5 28,0 t28,0`, .9, flood?'#5a4e34':'#4f625f', .5) + ln(`M${62+i*90} ${riverY+34+(i%2)*14} q10,-3 20,0`, 1.2, '#f4f1e2', .5);
+  if (flood) s += [[120,riverY+10],[380,riverY+30],[540,riverY+14]].map(([x,y]) => ln(`M${x} ${y} l26,-6 M${x+8} ${y-2} l4,-7 M${x+16} ${y-4} l5,5`, 1.6, '#4a3a22', .85)).join('');
+  // 窝的灌丛（后层）
+  const cx = 300;
+  let denY, tcx = cx, tw = 190;
+  if (den==='high'){ s += `<path d="M170 ${riverY} Q240 216 310 214 T450 ${riverY}" fill="#d2b984" filter="url(#wash)"/><path d="M170 ${riverY} Q240 216 310 214 T450 ${riverY}" fill="none" stroke="#6b5538" stroke-width=".8" opacity=".5" filter="url(#rough)"/>`; denY = 226; tcx = cx+10; tw = 170; s += crotonThicket(tcx, denY+2, tw, 44, 1.3); }
+  else if (den==='low'){ denY = riverY - 10; s += reeds(150, 230, riverY+2) + crotonThicket(cx, denY+4, 190, 40, 1.7) + reeds(380, 470, riverY+2); }
+  else if (den==='tree'){ denY = 252; tw = 170; s += sausageTree(420, 252) + crotonThicket(cx, denY+2, tw, 40, 2.1); }
+  else { denY = 256; tcx = cx+40; tw = 130; s += boulders(cx+10, 260) + crotonThicket(tcx, denY-6, tw, 36, 2.6); }
+  if (time==='night') s += `<rect width="640" height="360" fill="#1f2538" opacity=".36"/><circle cx="${sunX}" cy="${sk.sunY}" r="${sk.sunR}" fill="#f6efd8" opacity=".9"/>`;
+  else if (time==='dusk') s += `<rect width="640" height="360" fill="#a05a2a" opacity=".08"/>`;
+  else if (time==='dawn') s += `<rect width="640" height="360" fill="#e8a070" opacity=".06"/>`;
+  // 动物：母亲在左，幼崽藏在灌丛里，事件动物在右
+  const litA = LIT ? ` filter="url(#${id}lit)"` : '', toneA = LIT ? ` filter="url(#${id}tone)"` : '';
+  let an = '';
+  const ALERT = ['move','pride','hyenas','nomads','leopard','elephant','buffalo','grazing','flood','baboon','hippo'];
+  const momStand = ALERT.includes(ev);
+  if (!opt.momGone && !opt.momAway) an += art(momStand ? 'lioness' : 'lionessLying', cx-150, denY+10, 'R');
+  const cubCols = opt.cubCols || CUB_COLORS;
+  const span = Math.min(tw - 50, 30 * Math.max(nC - 1, 1)), c0 = tcx - span/2;
+  for (let i = 0; i < nC; i++){
+    const px = nC > 1 ? c0 + span * i/(nC-1) : tcx, py = denY + 10 + (i%2)*4, col = cubCols[i%cubCols.length];
+    if (age < 21) an += art('newborn', px, py, i%2 ? 'L' : 'R', 2, [col, age >= 11]);
+    else an += art('cub', px, py, i%2 ? 'L' : 'R', age < 42 ? 1.25 : 1.45, [col]);
+  }
+  const A = {
+    alone: () => herd([['gazelle',560,214,'L'],['gazelle',596,218,'L'],['gazelle',624,215,'R']]) + art('jackal', 505, 264, 'L'),
+    snare: () => art('jackal', 548, 262, 'L') + snareWire(470, 262, 1.2),
+    move: () => art('eagle', den==='tree' ? 250 : 470, 128, 'L', 1.7),
+    leopard: () => (den==='tree' ? '' : sausageTree(566, 254)) + art('leopard', 492, 268, 'L'),
+    hyenas: () => herd([['hyena',468,272,'L'],['hyena',538,258,'L'],['hyena',604,270,'L'],['hyena',584,236,'L']]),
+    elephant: () => herd([['elephant',470,228,'L',.9],['elephant',560,244,'L'],['elephant',622,256,'L',.45]]),
+    buffalo: () => herd([['buffalo',478,270,'L',.9],['buffalo',592,264,'L',.9],['buffalo',548,232,'L',.9]]),
+    hippo: () => art('hippo', 500, riverY - 4, 'L', .9) + artWater('hippo', 600, riverY + 52, 'L', .45, id),
+    baboon: () => herd([['baboon',462,268,'L'],['baboon',512,254,'L'],['baboon',560,270,'R'],['baboon',606,258,'L'],['baboon',584,236,'L']]),
+    python: () => art('python', tcx + tw/2 + 30, denY + 16, 'L'),
+    snake: () => ({ puff: () => art('puff', tcx + tw/2 + 22, denY + 12, 'L', 1.6), cobra: () => art('cobra', tcx + tw/2 + 24, denY + 12, 'L', 1.3), mamba: () => art('mamba', tcx + tw/2 + 36, denY + 12, 'L', 1.4) })[opt.snake || 'puff'](),
+    nomads: () => herd([['male',478,274,'L'],['male',576,260,'L']]),
+    grazing: () => herd([['zebu',596,250,'L',1,['#a07850','#f4ead4']],['zebu',468,260,'L'],['zebu',540,274,'L',1,['#4e3a2a','#c8b89a']],['herder',626,270,'L']]),
+    poison: () => { const g = art('zebu', 510, 270, 'L', 1, ['#6a5040','#c8b89a']); const cy = 270 - _pt.h/2; return `<g transform="rotate(180 510 ${cy.toFixed(1)}) translate(0,${(-_pt.h*.25).toFixed(1)})">${g}</g>` + vultureDead(560, 272, .8) + vultureFly(480, 90, 1) + vultureFly(540, 70, .8); },
+    meat: () => warthogCarcass(tcx + tw/2 + 10, denY + 12, .9),
+    pride: () => herd([['male',540,244,'L'],['lionessLying',470,270,'L'],['lioness',596,258,'L'],['cub',548,280,'R'],['cub',626,276,'L']])
+  };
+  _pt = { top:1e9, x0:1e9, x1:-1e9, h:0 };
+  const evArt = A[ev] ? A[ev]() : '';
+  const pt = _pt;
+  s += `<g${litA}>${an}${evArt}</g>`;
+  // 灌丛前层：遮住幼崽的下半身
+  if (nC) s += `<g${toneA}>${crotonFront(tcx, denY + 10, Math.min(tw - 30, span + 50), age < 21 ? 3 : 5, 1.9)}</g>`;
+  if (rain) s += `<rect width="640" height="360" fill="url(#${id}rain)"/>`;
+  s += `<rect width="640" height="360" filter="url(#grain)" opacity=".8"/>`;
+  // 野外笔记：图版、手写批注、比例尺、指北针
+  if (opt.plate) s += `<g><rect x="14" y="14" width="${Math.max(132, opt.plate[0].length*18+44, opt.plate[1].length*6.4+26)}" height="46" fill="#f6edd6" stroke="#6b5538" stroke-width="1" opacity=".95"/>
+    <text x="24" y="35" font-size="16" font-weight="900" fill="${INK}">${esc(opt.plate[0])}</text>
+    <text x="24" y="52" font-size="11" font-style="italic" fill="#6b5538" font-family="Georgia,serif">${esc(opt.plate[1])}</text></g>`;
+  if (opt.notes !== false){
+    const nc = time==='night' ? '#f2e7cd' : '#5a3e20';
+    const hand = (x,y,t,sz=15,anchor='start') => `<text x="${x}" y="${y}" font-size="${sz}" fill="${nc}" font-family='${HAND}' text-anchor="${anchor}" opacity=".92">${esc(t)}</text>`;
+    if (opt.dayNote) s += hand(626, 32, opt.dayNote, 16, 'end');
+    const momTop = denY + 10 - 105 * (momStand ? .64 : .5) * depthF(denY + 10);
+    if (!opt.momGone && !opt.momAway) s += hand(cx-190, momTop - 8, opt.momName || '母狮', 14);
+    if (nC) s += hand(tcx, denY + 34, `幼崽 ×${nC}`, 14, 'middle');
+    const DEN_NOTE = { high:'高处的巴豆灌丛', low:'水边的低矮灌丛', tree:'香肠树下的灌丛', rock:'岩石堆里的巴豆灌丛' };
+    s += hand(tcx, denY - 50, DEN_NOTE[den], 13, 'middle') + ln(`M${tcx} ${denY-46} q3,5 4,10`, .8, nc, .6);
+    if (opt.animalNote){
+      const ax = pt.top < 1e9 ? clamp((pt.x0 + pt.x1)/2, 470, 590) : 560, ay = pt.top < 1e9 ? Math.max(pt.top - 12, 84) : 204;
+      s += hand(ax, ay, opt.animalNote, 14, 'middle');
+    }
+    s += `<g opacity=".85">${ln('M24 340 h55', 1.2, nc)}${ln('M24 336 v8 M51.5 337 v6 M79 336 v8', 1, nc)}<text x="24" y="333" font-size="10" fill="${nc}">0</text><text x="72" y="333" font-size="10" fill="${nc}">1 米</text></g>`;
+    s += `<g transform="translate(610,330)" opacity=".85">${ln('M0 10 L0 -12', 1.1, nc)}<path d="M0 -14 l-4 8 h8z" fill="${nc}"/><text x="0" y="-18" font-size="10" text-anchor="middle" fill="${nc}">N</text></g>`;
+  }
+  return s + '</svg>';
+}
+
+/* 分享卡片上的单只幼崽画像（原尺寸手绘，不靠放大小图） */
+function cubPortraitSVG(o){
+  const col = o.col || '#e8c48a';
+  const time = o.win ? 'dawn' : 'dusk', sk = SKY[time];
+  const sp = [];
+  for (let i = 0; i < 46; i++){ const t = (i*0.618)%1, u = (i*0.382*1.7)%1; const x = 175 + t*215, y = 246 + u*46 - (t>.75 ? (t-.75)*60 : 0); if (x < 360 || y > 262) sp.push([x.toFixed(1), y.toFixed(1)]); }
+  const body = 'M150,296 C140,276 150,252 180,242 C210,232 250,234 282,238 C300,228 330,214 360,216 C388,218 408,236 410,256 C420,260 426,270 420,280 C414,288 404,290 396,290 L432,290 C444,290 450,296 444,300 L300,300 C290,300 280,298 270,296 C240,300 200,302 170,300 C160,300 152,300 150,296 Z';
+  let s = `<svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" font-family='Noto Serif SC,serif'>
+  <defs>
+    <filter id="pwc" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="4"/><feGaussianBlur stdDeviation=".6"/></filter>
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="1" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.2"/></filter><filter id="blur2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>
+    <filter id="pink"><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="1" seed="2"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter>
+    <linearGradient id="ps" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk.top}"/><stop offset="1" stop-color="${sk.bot}"/></linearGradient>
+    <radialGradient id="pfur" cx=".55" cy=".35" r=".7"><stop offset="0" stop-color="#f3d8a6"/><stop offset="1" stop-color="${col}"/></radialGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#ps)"/>
+  <circle cx="540" cy="${sk.sunY}" r="${sk.sunR+12}" fill="${sk.sun}" opacity="${sk.sunOp*.75}"/>
+  <path d="M0 236 Q160 220 320 234 T640 230 V360 H0Z" fill="#dcc591" filter="url(#pwc)"/>
+  <path d="M0 312 Q160 304 320 312 T640 308 V360 H0Z" fill="#a9bab3" opacity=".9"/>`;
+  s += crotonThicket(70, 272, 200, 110, 1.9) + crotonThicket(585, 268, 180, 96, 2.7);
+  s += grassTufts(16, 300, 310);
+  if (!o.noCub){
+  // 尾巴
+  s += `<path d="M154,294 C122,304 104,292 112,278" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/><path d="M154,294 C122,304 104,292 112,278" fill="none" stroke="${col}" stroke-width="3.8" stroke-linecap="round"/>`;
+  // 耳朵（背面深色）
+  s += `<circle cx="350" cy="216" r="15" fill="#9a6e3c" stroke="${INK}" stroke-width="1.6" filter="url(#pink)"/><circle cx="350" cy="218" r="8" fill="#e9c896"/>`;
+  s += `<circle cx="384" cy="210" r="14" fill="#9a6e3c" stroke="${INK}" stroke-width="1.6" filter="url(#pink)"/><circle cx="384" cy="212" r="7.5" fill="#e9c896"/>`;
+  // 身体
+  s += `<path d="${body}" fill="url(#pfur)" filter="url(#pwc)"/><path d="${body}" fill="none" stroke="${INK}" stroke-width="2" stroke-linejoin="round" filter="url(#pink)"/>`;
+  s += dots(sp, 2.8, '#a8743c', .3);
+  s += ln('M186,296 C176,276 190,258 214,256 C236,256 246,272 244,290', 1.4, INK, .55);
+  s += ln('M300,296 C304,284 312,276 322,274', 1.2, INK, .45);
+  s += ln('M396,290 C398,294 400,298 400,300 M416,292 C418,296 418,298 418,300', 1.1, INK, .6);
+  s += ln('M200,244 l6,-4 M220,240 l6,-4 M240,238 l6,-4 M260,238 l6,-4 M280,238 l6,-4', 1, '#9a6e3c', .45);
+  // 脸
+  s += `<path d="M386,246 C390,240 400,240 404,246 C400,250 390,250 386,246 Z" fill="#7a8a8e" stroke="${INK}" stroke-width="1.4"/><circle cx="396" cy="245" r="2.6" fill="${INK}"/><circle cx="397.6" cy="243.8" r=".9" fill="#fff"/>`;
+  s += ln('M384,240 C388,236 398,234 406,238', 1.2, INK, .7);
+  s += `<path d="M415,262 l7,-1 l-3,6 z" fill="#8a5a46" stroke="${INK}" stroke-width="1"/>`;
+  s += ln('M419,268 C418,274 412,278 406,276', 1.3) + ln('M412,272 l-14,-2 M412,275 l-14,2 M411,278 l-12,5', .7, INK, .55);
+  s += dots([[405,268],[408,271],[403,272]], 1, INK, .6);
+  }
+  s += `<g transform="translate(170,${(306 - 138*1.75).toFixed(1)}) scale(1.75)">${cubStanding(col)}</g>`;
+  s += `<text x="24" y="44" font-size="22" fill="#5a3e20" font-family='${HAND}'>${esc(o.note || '')}</text>`;
+  s += `<text x="616" y="344" font-size="13" fill="#5a3e20" text-anchor="end" font-family='${HAND}'>恩提亚克提亚克河 · 第 ${o.day} 天</text>`;
+  return s + '</svg>';
+}
+
+function renderScene(){
+  const ev = EV[S.evId] || {};
+  const plate = S.plateOverride || ev.plate;
+  const A_NOTE = { leopard:'花豹', hyenas:'斑鬣狗 ×3', elephant:'象群', buffalo:'非洲水牛群', hippo:'河马上岸的老路', baboon:'狒狒群', python:'', snake:'', nomads:'流浪雄狮 ×2', grazing:'非法放牧的牛群', poison:'投毒的牛尸', snare:'钢丝套', meat:'疣猪', pride:'狮群' };
+  const momAway = S.momAwayNow || ev.forceMom === '出猎';
+  $('scene').innerHTML = sceneSVG({ den:S.den, ev:S.evId, flood:ev.flood, plate, cubs:1 + sibs().length, momGone:S.momDead, momAway,
+    age:S.age, snake:S.snakeSeen, dayNote:`第 ${S.age} 天 · ${({dawn:'黎明',day:'白天',dusk:'黄昏',night:'夜'})[TIME_OF[S.evId]||'day']}`,
+    momName:N('mom'), animalNote:A_NOTE[S.evId] || '', cubCols:[S.myColor || CUB_COLORS[0], ...sibs().map(k => S.chars[k].color)] });
+  $('denLbl').innerHTML = `窝：<b>${DEN[S.den].name}</b>`;
+  $('plateLbl').textContent = plate ? `${plate[0]} · ${plate[1]}` : '';
+}
+
+/* ============ 界面 ============ */
+function addLog(cls, html){
+  const d = document.createElement('div'); d.className = 'e ' + cls; d.innerHTML = html;
+  $('log').appendChild(d); $('log').scrollTop = $('log').scrollHeight;
+}
+function renderStatus(){
+  $('meName').textContent = S.name; $('meSex').innerHTML = (S.maa?` <span style="font-style:italic;font-size:12px;color:var(--ink2)">${esc(S.maa)}</span>`:'') + SXT(S.sex);
+  $('ageLbl').textContent = `出生第 ${S.age} 天`;
+  $('stageLbl').textContent = `${phase(S.age).name}${S.blind>0?' · 暂时失明':''}`;
+  $('foodBar').style.width = clamp(S.food,0,100)+'%';
+  $('hpBar').style.width = clamp(S.hp,0,100)+'%';
+  $('momBar').style.width = clamp(S.momFood,0,100)+'%';
+  $('pride').innerHTML = Object.keys(S.chars).map(k => {
+    const c = S.chars[k];
+    const face = k==='mom' ? FACE.mom : FACE.cub(c.color);
+    return `<div class="chip ${c.gone?'gone':''}" data-k="${k}"><div class="face">${face}</div>
+      <div class="nm">${c.name}${k==='mom'?'':SXT(c.sex)}</div><div class="rl">${c.gone?'已不在':c.role}</div>
+      <div class="bond"><i style="width:${clamp(c.bond,0,100)}%"></i></div></div>`;
+  }).join('');
+  document.querySelectorAll('.chip').forEach(el => el.onclick = () => showMem(el.dataset.k));
+}
+function showMem(k){
+  const c = S.chars[k];
+  $('memTitle').innerHTML = `${esc(c.name)} <span style="font-weight:400;font-style:italic;color:var(--ink2)">${esc(c.maa||'')}</span>${k==='mom'?'':SXT(c.sex)} · ${esc(c.role)}${c.meaning?`<div style="font-size:13px;font-weight:400;color:var(--ink2);margin-top:2px">马赛语名字的含义：${esc(c.meaning)}</div>`:''}`;
+  $('memBody').innerHTML = `<div style="font-size:13px;color:var(--ink2);line-height:1.7">${esc(c.persona)}</div>
+    <div style="margin-top:8px;font-size:13px">对你的亲密度：<b>${c.bond}</b> / 100</div>
+    <div style="margin-top:8px;font-size:13px;font-weight:600">它记得的事</div>
+    ${c.mem.length ? '<ul>'+c.mem.map(m=>`<li>${esc(m)}</li>`).join('')+'</ul>' : '<div style="font-size:13px;color:var(--ink2)">还没有。</div>'}`;
+  $('memSheet').classList.add('on');
+}
+function closeSheet(id){ $(id).classList.remove('on'); }
+function setBusy(b){
+  S.busy = b; $('thinking').classList.toggle('on', b);
+  document.querySelectorAll('#controls button').forEach(x => x.disabled = b);
+  $('simbaBtn').disabled = b || S.simbaUsedTurn === S.turn;
+}
+function fillLabel(l){ const s = sibs(); return l.replace('{SIBS}', sibWord()).replace('{S1}', s.length ? N(s[0]) : ''); }
+
+function startTurn(){
+  S.age = SCHEDULE[S.turn];
+  S.simbaToday = false; S.plateOverride = null; S.momAwayNow = false;
+  if (S.momSnared && S.turn > 0) S.momFood -= P.snare_mom_daily;
+  S.evId = pickEvent(S.turn); S.used.push(S.evId);
+  const ev = EV[S.evId];
+  addLog('dayh', `出生第 ${S.age} 天 · ${phase(S.age).name}`);
+  patrolTick();
+  if (S.momSnared) addLog('sys', `${esc(N('mom'))}脖子上的钢丝还勒着，伤口越来越肿，她瘦得很快。`);
+  addLog('ev', `<span class="tt">${ev.title}<span class="tag ${ev.type!=='自然'?'h':''}">${ev.type}</span></span>${esc(ev.desc())}`);
+  const ch = shuffle(ev.choices.filter(c => !(/\{S1\}|\{SIBS\}/.test(c[0]) && !sibs().length)));
+  $('choices').innerHTML = '';
+  ch.forEach(([label, cat]) => {
+    const text = fillLabel(label);
+    const b = document.createElement('button'); b.textContent = text;
+    b.onclick = () => act(text, cat); $('choices').appendChild(b);
+  });
+  renderStatus(); renderScene(); setBusy(false);
+}
+
+/* ============ AI 回合 ============ */
+function buildPrompt(actionText, catHint){
+  const ev = EV[S.evId];
+  const ks = active();
+  const ph = phase(S.age);
+  const charInfo = ks.map(k => {
+    const c = S.chars[k];
+    const sx = k==='mom' ? '' : `，${c.sex==='m'?'雄性':'雌性'}`;
+    const forced = (ev.forceMom && k==='mom') ? `【此刻不在窝里：她正在外面，intent 固定为“${ev.forceMom}”，line 写她在外面的状态】` : '';
+    return `- ${k}：${c.name}（${c.role}${sx}）。性格：${c.persona} 对${S.name}的亲密度 ${c.bond}/100。记得的事：${c.mem.slice(-6).join('；')||'无'}。${forced}`;
+  }).join('\n');
+  const intents = ks.map(k => `${k}: ${S.chars[k].intents.join('/')}`).join('；');
+  const denList = Object.entries(DEN).map(([k,d]) => `${k}=${d.name}（${d.desc}）`).join('；');
+  return `你是AI生态游戏《幼狮成长记》的角色引擎。场景：东非马赛马拉，恩提亚克提亚克河边。玩家是一只${S.sex==='m'?'雄性':'雌性'}幼狮「${S.name}」，今天出生第${S.age}天（${ph.name}：${ph.ai}）。
+母狮${N('mom')}离开狮群，在河边的灌丛里独自生下了这一窝${S.litter}只幼崽。在幼崽约两个月大之前，只有她一个人抚养它们，狮群里的其他狮子都不在身边。她只会在河边不同的灌丛之间搬窝。
+
+你要同时扮演母亲和同窝幼崽。规则：
+1. 狮子不会说人话。每个角色的 line 用「动作描写 + （心声）」表现，例如：低吼一声，用鼻子把你拱回窝里。（别乱动。）不超过45个字。
+2. 行为必须符合真实的狮子行为学和幼崽当前的发育阶段（闭眼期的幼崽不会走路，也看不见）。
+3. 母亲面临真实的两难：她必须出猎才有奶水，可她一离开，幼崽就无人守护。她的体况越差，越应该考虑出猎；窝的气味重、被暴露或有危险时，应考虑搬窝。
+4. 亲密度决定角色愿意为玩家付出多少：亲密度高的更可能保护、哺育、依偎；亲密度低的更可能冷落、争抢。
+5. 你只决定角色“想做什么”(intent)。不要写事件的结果——不写谁受伤、死亡、狩猎成败，结果由游戏引擎裁定。
+6. 不评价玩家的选择，不提示风险。bond_delta 为 -8 到 8 的整数，多数情况下很小。
+7. 如果母亲的 intent 是“搬窝”，用 den 字段选择新窝：${denList}。现在的窝是 ${S.den}。
+
+近况：${S.history.slice(-5).join('；')||'刚刚出生。'}
+状态：${S.name}饱腹 ${S.food}/100，体力 ${S.hp}/100${S.blind>0?'，眼睛被蛇毒喷伤、暂时看不见':''}；母亲体况 ${S.momFood}/100${S.momHurt?'，身上有伤':''}${S.momSnared?'，脖子上勒着钢丝套':''}${S.denStale?'；窝里气味很重，早该搬了':''}${S.exposed?'；窝的位置刚被狒狒的叫声暴露':''}。
+此刻的事件：「${ev.title}」${ev.desc()}
+玩家的行动：「${actionText}」${catHint?`（行动类别：${catHint}）`:''}
+
+角色：
+${charInfo}
+
+可选 intent：${intents}
+
+只输出 JSON，不要任何其他文字：
+{"player_action":"follow|hide|play|explore|eat|call|other 之一（follow=贴近/跟随母亲，hide=躲藏或不动，play=和同窝幼崽玩耍或挤在一起，explore=离开、探索或招惹，eat=吃奶或吃东西，call=叫唤）","characters":[{"id":"角色id","intent":"从该角色的可选intent中选一个","line":"…","bond_delta":0,"memory":"这个角色从这件事里记住了关于${S.name}的什么（不超过18字）"}],"den":"仅当母亲搬窝时填 high/low/tree/rock，否则留空","narration":"一句河边环境描写（不超过35字）"}`;
+}
+
+const OFFLINE = {
+  mom:{保护:'把你们拢到身下，耳朵朝外转着。（别出声。）',哺育:'侧身躺下，喉咙里发出低低的呼噜声。（吃吧。）',出猎:'舔了舔你们，钻出灌丛消失在暮色里。（等我回来。）',搬窝:'轻轻叼住一只幼崽的后颈，站起身。（这里不安全了。）',教导:'甩着尾巴尖逗你去扑。（看准了再扑。）',休息:'半闭着眼，尾巴懒懒地拍着地。（嗯……）'},
+  sib:{玩耍:'扑过来咬你的耳朵。（来呀！）',争抢:'把你从奶头边挤开。（我的！）',依偎:'把脑袋埋进你的毛里。（好冷……）',躲藏:'缩成一团，一动不动。（我不出去……）',探索:'摇摇晃晃地往窝外爬。（那是什么？）'}
+};
+function offlineResult(cat){
+  const ev = EV[S.evId];
+  const WARM = ['保护','哺育','教导','依偎','玩耍','搬窝'];
+  return { player_action:cat||'other', narration:'', den: pick(Object.keys(DEN)),
+    characters: active().map(k => {
+      const c = S.chars[k];
+      let it;
+      if (k==='mom' && ev.forceMom) it = ev.forceMom;
+      else if (k==='mom' && S.momFood < 45 && r(.6)) it = '出猎';
+      else if (k==='mom' && (S.evId==='move' || S.denStale || S.exposed) && r(.6)) it = '搬窝';
+      else {
+        const ws = c.intents.map(x => WARM.includes(x) ? 1 + 2*bondN(k) : 1 + 2*(1 - bondN(k)));
+        let roll = Math.random() * ws.reduce((a,b)=>a+b,0), i = 0;
+        while (i < ws.length-1 && roll > ws[i]) { roll -= ws[i]; i++; }
+        it = c.intents[i];
+      }
+      return {id:k,intent:it,line:(k==='mom'?OFFLINE.mom:OFFLINE.sib)[it]||'',bond_delta:0,memory:''};
+    })};
+}
+
+async function act(label, cat){
+  if (S.busy) return;
+  const text = String(label||'').trim(); if (!text) return;
+  $('freeIn').value = '';
+  setBusy(true);
+  addLog('me', `你：${esc(text)}`);
+  let res;
+  if (sample){
+    try { res = await askJSON(buildPrompt(text, cat)); }
+    catch(e){
+      addLog('sys', e && e.code==='rate_limited' ? 'AI 有点忙，这一回合用预设反应。' : (e && e.code==='not_granted' ? 'AI 未获授权，已切换到离线模式。' : 'AI 这次没有回应，用预设反应。'));
+      res = offlineResult(cat);
+    }
+  } else res = offlineResult(cat);
+
+  const ev = EV[S.evId];
+  const valid = ['follow','hide','play','explore','eat','call','other'];
+  const a = cat || (valid.includes(res.player_action) ? res.player_action : 'other');
+  S.cats[a] = (S.cats[a]||0) + 1; if (!cat) S.freeCount++;
+  const sibsBefore = sibs().map(N);
+  const I = {}, lines = [];
+  for (const k of active()){
+    const c = S.chars[k];
+    const got = (res.characters||[]).find(x => x && x.id === k) || {};
+    let it = c.intents.includes(got.intent) ? got.intent : c.intents[0];
+    if (k==='mom' && ev.forceMom) it = ev.forceMom;
+    I[k] = it;
+    if (k==='mom') S.momAwayNow = it === '出猎';
+    const d = clamp(parseInt(got.bond_delta)||0, -8, 8);
+    c.bond = clamp(c.bond + d, 0, 100); if (d > 0) S.bondUp += d; else S.bondDown -= d;
+    if (got.memory){ c.mem.push(`第${S.age}天：${String(got.memory).slice(0,24)}`); if (c.mem.length > 8) c.mem.shift(); }
+    if (got.line) lines.push([k, String(got.line).slice(0,90), d]);
+  }
+  if (res.narration) addLog('nar', esc(String(res.narration).slice(0,60)));
+  for (const [k,l,d] of lines){
+    await wait(360);
+    addLog('ch '+(k==='mom'?'mom':'sib'), `<b>${S.chars[k].name}</b>${esc(l)}${d?`<span class="bd ${d>0?'up':'dn'}">亲密 ${d>0?'+':''}${d}</span>`:''}`);
+  }
+
+  // 1) 事件裁定
+  await wait(450);
+  const exposedBefore = S.exposed;
+  const out = ev.resolve(a, I);
+  S.food = clamp(S.food + (out.food||0), 0, 100);
+  S.hp = Math.min(100, S.hp + (out.hp||0));
+  const entry = { age:S.age, title:ev.title, evId:S.evId, type:ev.type, text, out:out.t, hurt:(out.hp||0) < 0, help: ev.type!=='自然' && (S.patrolHere || S.simbaToday) };
+  if (entry.help) S.patrolHelps++;
+  S.journey.push(entry);
+  const closeEntry = () => { const now = sibs().map(N); entry.lost = sibsBefore.filter(n => !now.includes(n)); };
+  addLog('out', esc(out.t));
+  if (out.bond) for (const k in out.bond) if (S.chars[k] && !S.chars[k].gone){ S.chars[k].bond = clamp(S.chars[k].bond + out.bond[k], 0, 100); addLog('sys', `${esc(N(k))} 亲密 +${out.bond[k]}`); }
+  renderScene();
+  if (S.hp <= 0 || S.momDead) closeEntry();
+  if (S.hp <= 0) return endGame(false, out.hp <= -999 ? out.t : '你的伤太重了。在马拉，幼狮的头几个月处处是生死关口。');
+  if (S.momDead) return endGame(false, '失去母亲的幼崽，没有奶水，也没有谁能护着它们。几天之后，河边的灌丛安静了下来。投毒，是马拉狮子面临的最致命的人为威胁之一。');
+
+  // 2) 搬窝：母亲选新灌丛
+  const ext = [];
+  if (I.mom === '搬窝'){
+    const nd = DEN[res.den] && res.den !== S.den ? res.den : (ev.denChoice ? pick(Object.keys(DEN).filter(k => k !== S.den)) : null);
+    if (nd && (ev.denChoice || ev.flood || S.denStale || S.exposed || r(.6))){
+      S.den = nd; S.denStale = false; S.exposed = 0; S.denHistory.push(nd);
+      ext.push(`${N('mom')}把窝搬到了${DEN[nd].name}——${DEN[nd].desc}`);
+    }
+  }
+  // 3) 母亲独自狩猎
+  if (I.mom === '出猎' && !['meat','pride'].includes(S.evId)){
+    const p = P.solo_hunt * (S.momHurt ? .5 : 1);
+    if (r(p)){ S.momFood += P.hunt_gain; ext.push(`${N('mom')}在河边独自扑倒了一头汤氏瞪羚，吃饱了才回来。`); }
+    else { S.momFood -= 4; ext.push(`${N('mom')}空着肚子回来了，独自狩猎太难了。`); }
+  }
+  // 4) 哺乳：母亲体况决定奶水，同窝越多，分到越少
+  const present = I.mom !== '出猎';
+  let milk = 0;
+  if (present){
+    const share = clamp(2.8 / (1 + sibs().length), .55, 1.15);
+    const full = P.milk_gain * (0.35 + 0.65 * clamp(S.momFood,0,100)/100) * (0.7 + 0.6*bondN('mom')) * share;
+    if (I.mom === '哺育') milk = full;
+    else if (a==='eat' || a==='follow') milk = full * .55;
+    else milk = full * .2;
+    const grab = sibs().filter(k => I[k]==='争抢' && bondN(k) < .65);
+    if (grab.length && milk > 0){ milk *= Math.max(.5, 1 - .15*grab.length); ext.push(`${grab.map(N).join('、')}抢着挤占奶头，你少吃了好几口。`); }
+    if (S.age >= 42) milk *= .85;
+  }
+  if (milk > 0) S.food = clamp(S.food + Math.round(milk), 0, 100);
+  if (present && S.momFood < 30 && I.mom==='哺育') ext.push(`${N('mom')}太瘦了，奶水很稀。`);
+  // 5) 消耗与饥饿
+  S.momFood = clamp(S.momFood - P.mom_decay, 0, 100);
+  S.food -= P.cub_need;
+  if (S.food <= 0){ S.food = 0; S.hp -= P.starve_dmg; ext.push('你饿得没有力气了……'); }
+  if (S.momFood < P.sib_starve_th && sibs().length && r(P.sib_starve * sibs().length / 2)) ext.push(killSib('{X}一天比一天弱，叫声越来越小……最后，再也没有醒来。'));
+  if (S.momFood <= 0){ S.momFood = 0; S.hp -= 10; ext.push(`${N('mom')}已经瘦得皮包骨头，几乎没有奶水了。`); }
+  if (S.blind > 0){ S.blind--; if (!S.blind) ext.push('你的眼睛终于又能看见了。'); }
+  if (S.exposed > 0 && exposedBefore > 0) S.exposed--;
+  for (const t of ext) addLog('sys', esc(t));
+  closeEntry();
+  S.history.push(`第${S.age}天「${ev.title}」：${S.name}${text}；${out.t.slice(0,40)}`);
+  renderStatus(); renderScene();
+  if (S.hp <= 0) return endGame(false, '饥饿带走了你。母亲体况太差、奶水不足，是幼狮夭折最常见的原因之一。');
+
+  if (ev.final) return endGame(true);
+  S.turn++;
+  await wait(700);
+  startTurn();
+}
+
+/* ============ 星巴 ============ */
+const SIMBA_OFF = {
+  birth:'母狮快生产时会离开狮群，找一片隐蔽的灌丛独自生下幼崽。一窝通常两到四只，刚出生时眼睛是闭着的。',
+  alone:'母狮必须出去狩猎才有奶水，可她一走，窝里的幼崽就没人守护。这时最好的保护就是安静和隐蔽。',
+  eyes:'幼狮出生后三到十几天才睁眼。刚睁眼时眼睛是蓝灰色的，要好几个月才会变成琥珀色。',
+  move:'母狮每隔一段时间就会搬窝，把幼崽一只只叼着后颈转移，免得气味积累引来天敌。河边每片灌丛都有自己的好处和危险。',
+  hyenas:'斑鬣狗是幼狮最大的天敌之一。母狮在场时，它们通常不敢闯进窝里。',
+  leopard:'花豹会趁母狮不在时袭击幼狮，把它们拖到树上。母狮发现花豹会立刻追赶。',
+  baboon:'狒狒群发现危险时会发出很响的警报叫声，整个河岸的动物都听得见。母狮不在时，雄狒狒也可能伤害幼崽。',
+  python:'非洲岩蟒喜欢潮湿的河边和岩缝，很小的幼崽它能整个吞下。等幼崽长大一些，它就吞不下了。',
+  snake:'蛇一般不会主动招惹幼狮，危险多半来自幼崽自己去碰它。鼓腹蝰蛇伏着不动，喷毒眼镜蛇会喷眼，黑曼巴极快、极毒，但通常会逃走。',
+  hippo:'河马每天夜里上岸吃草，沿着固定的老路走。它们脾气暴躁，是非洲最危险的动物之一。',
+  elephant:'大象很讨厌狮子，尤其是带着小象的象群，会主动冲进灌丛驱赶狮子。',
+  buffalo:'非洲水牛会集体围攻狮子，幼狮更是它们的目标。一头母狮单独根本对付不了水牛群。',
+  flood:'雨季上游的暴雨会让河水突然暴涨，低处的窝很容易被淹。有经验的母狮会冒雨把幼崽转移到高处。',
+  grazing:'这是非法放牧，是人为的威胁。牛群会赶走猎物、踩坏幼崽藏身的灌丛，还会引发报复。我会带巡护员去把牛群赶出保护区。',
+  poison:'有人在牛尸上投了毒，这是人为的伤害，也是马拉狮子最致命的威胁之一。我会立刻带人赶过去。',
+  snare:'盗猎者下的钢丝套本来是套羚羊的，却常常套住狮子。这是人为的伤害，巡护员每天都在清除它们，兽医也能帮母狮解开钢丝。',
+  nomads:'没有领地的年轻雄狮如果找到幼崽，往往会杀死它们，让母狮尽快再次发情。这很残酷，但这是自然，我不会插手。',
+  meat:'幼狮大约六周起开始尝肉，但要到六个月左右才完全断奶。',
+  pride:'幼崽大约六到八周大时，母狮会带它们回到狮群。狮群里的母狮常常会互相哺育彼此的幼崽。'
+};
+async function askSimba(){
+  if (S.busy || S.simbaUsedTurn === S.turn) { closeSheet('simbaSheet'); return; }
+  const q = $('simbaIn').value.trim() || '星巴，现在发生了什么？';
+  $('simbaIn').value = ''; closeSheet('simbaSheet');
+  const ev = EV[S.evId];
+  const human = ev.type !== '自然';
+  S.simbaUsedTurn = S.turn; S.simbaAsks++;
+  setBusy(true);
+  addLog('me', `你问星巴：${esc(q)}`);
+  let txt = '';
+  if (sample){
+    try {
+      const prompt = `你是星巴（Simba），一位在马赛马拉与狮群共同生活了16年的华人野生动物保护者，此刻以你本人的身份出现在游戏《幼狮成长记》里，和一只出生第${S.age}天的${S.sex==='m'?'雄性':'雌性'}幼狮「${S.name}」说话。你每天带着巡护员在恩提亚克提亚克河一带巡护。语气温和、简洁，带着野外经验，用中文。
+
+规则：
+- 自然界发生的事（天敌、蛇、河马、大象、水牛、洪水、饥饿、流浪雄狮杀婴等），你绝不干预，只分享知识，帮它理解草原。
+- 人为造成的伤害（非法放牧、钢丝套、投毒），你会出手：说明你和巡护员、兽医要做什么。非法放牧是违法行为，巡护员会把牛群赶出保护区。
+- 不要告诉玩家该选哪个选项，不评价哪个选择更危险。
+- 不要提及任何具体保护地的名字。不超过120字。
+
+当前事件「${ev.title}」：${ev.desc()}（事件性质：${human?'人为':'自然'}）
+幼狮状态：饱腹${S.food}，体力${S.hp}；母亲体况${S.momFood}${S.momSnared?'，母亲脖子上勒着钢丝套':''}。
+幼狮问你：「${q}」`;
+      const r1 = await sample(prompt, { modelTier:'default' });
+      txt = r1.text;
+    } catch(e){ txt = ''; }
+  }
+  if (!txt) txt = S.momSnared ? '别怕，孩子。你妈妈脖子上的钢丝我看见了，兽医已经在路上，我们这就去帮她解开。' : (SIMBA_OFF[S.evId] || '看，听，闻。草原会告诉你答案。');
+  addLog('simba', `<b>星巴：</b>${esc(txt)}`);
+  if (S.momSnared){
+    S.momSnared = false; S.momHurt = false; S.momFood = Math.min(100, S.momFood + 10);
+    addLog('out', `兽医团队用麻醉镖让${esc(N('mom'))}睡着，剪开了钢丝，清理了伤口。几个小时后她醒过来，摇摇晃晃地回到了你们身边。`);
+    renderStatus();
+  } else if (human){
+    S.simbaToday = true;
+    addLog('patrol', '<b>巡护记录：</b>星巴带着巡护员正往这边赶。');
+  }
+  setBusy(false);
+}
+
+/* ============ 结局 ============ */
+function endGame(win, reason){ renderReport(win, reason); }
+
+/* ============ 成长报告 ============ */
+const MBTI_INFO = {
+  ENFP:['河边的小探险家','对什么都好奇，也对谁都热情，总是第一个钻出灌丛去看新东西。'],
+  INFP:['灌丛里的小梦想家','安静、敏感，常常一个人望着河面出神，心里装着很多感受。'],
+  ENFJ:['窝里的小守护者','总在照顾兄弟姐妹的情绪，是这一窝里最有凝聚力的那只。'],
+  INFJ:['安静的小预言家','话不多，却总能先一步察觉危险和妈妈的心思。'],
+  ENTP:['爱捣蛋的小发明家','点子多，爱试探规则，常做出谁也想不到的事。'],
+  INTP:['好奇的小观察家','喜欢躲在一旁琢磨：那条蛇为什么不动？河水为什么会涨？'],
+  ENTJ:['天生的小狮王','果断、要强，抢奶和打闹都要争第一。'],
+  INTJ:['沉着的小谋略家','冷静、有主见，懂得什么时候该等，什么时候该动。'],
+  ESFP:['草原上的开心果','活泼爱玩，走到哪儿都能和兄弟姐妹闹成一团。'],
+  ISFP:['温柔的小艺术家','温和、随性，喜欢贴着妈妈，用自己的节奏感受世界。'],
+  ESFJ:['兄弟姐妹的贴心伙伴','黏人、重感情，总和大家挤在一起取暖。'],
+  ISFJ:['妈妈的小影子','乖巧、谨慎，妈妈走到哪里就跟到哪里。'],
+  ESTP:['无畏的小冒险家','胆子大、反应快，危险面前也敢冲上去哈气。'],
+  ISTP:['冷静的小猎手','不声不响，却总能在关键时刻做出最实际的选择。'],
+  ESTJ:['窝里的小队长','守规矩、有主见，该吃就吃，该躲就躲。'],
+  ISTJ:['稳重的小卫士','踏实、谨慎，从不乱来，靠稳妥一天天活下来。']
+};
+function computeMBTI(){
+  const c = k => S.cats[k] || 0, F = S.freeCount;
+  const turns = Object.values(S.cats).reduce((a,b)=>a+b,0) || 1;
+  const top = Math.max(...Object.values(S.cats), 0) / turns;
+  const variety = Object.keys(S.cats).filter(k => S.cats[k] > 0).length / 7;
+  const dims = [
+    ['E','外向', c('call') + c('play') + .5*c('explore'),           'I','内向', c('hide') + .5*c('follow') + .3*c('eat')],
+    ['N','直觉', c('explore') + F + .5*c('other') + .3*c('call'),    'S','实感', c('eat') + c('follow') + .5*c('hide')],
+    ['F','情感', c('play') + .6*c('follow') + S.bondUp/6,            'T','思考', .8*c('eat') + .4*c('explore') + .3*c('hide') + S.bondDown/4],
+    ['P','感知', .7*c('explore') + .5*c('call') + .8*F + .5*c('other') + 3*variety, 'J','判断', .6*(c('hide') + c('follow') + c('eat')) + 3*top]
+  ];
+  let type = '';
+  const bars = dims.map(([a,an,av,b,bn,bv]) => {
+    const pa = Math.round((av + .5) / (av + bv + 1) * 100);
+    type += pa >= 50 ? a : b;
+    return { a, an, b, bn, pa };
+  });
+  // 输出顺序 E/I S/N T/F J/P
+  const order = [type[0], type[1]==='N'?'N':'S', type[2]==='F'?'F':'T', type[3]==='P'?'P':'J'].join('');
+  return { type:order, bars };
+}
+function endReason(win, reason){
+  if (win) return '回到了狮群';
+  return '没能活过两个月';
+}
+function renderReport(win, reason){
+  $('game').classList.add('hidden'); $('end').classList.remove('hidden');
+  const m = computeMBTI(); S.mbti = m;
+  const [title, desc] = MBTI_INFO[m.type];
+  const no = String(Math.floor(Math.random()*9000)+1000);
+  const sibIds = SIB_IDS.filter(k => S.chars[k]);
+  const famHTML = sibIds.map(k => { const c = S.chars[k]; return `${esc(c.name)}${SXT(c.sex)}${c.gone?'<span style="color:var(--earth)">（没能活下来）</span>':''}`; }).join('、');
+  const aliveN = sibs().length + (win ? 1 : 0);
+  const dens = S.denHistory.map(d => DEN[d].name).join(' → ');
+  const human = S.journey.filter(j => j.type !== '自然').length;
+  const threats = [...new Set(S.used.filter(x => !Object.values(MAIN).includes(x)))];
+
+  $('endTitle').textContent = win ? '你回到了狮群' : '草原的法则';
+  $('endSub').innerHTML = `野外观察档案 · No.${no}`;
+  const bar = b => `<div class="mb"><span class="l ${b.pa>=50?'on':''}">${b.an} ${b.a}</span><div class="t"><i style="width:${b.pa}%"></i></div><span class="r ${b.pa<50?'on':''}">${b.b} ${b.bn}</span><span class="pc">${b.pa>=50?b.pa:100-b.pa}%</span></div>`;
+  const timeline = S.journey.map(j => `<li><b>第 ${j.age} 天 · ${esc(j.title)}</b>${j.type!=='自然'?'<span class="tag h">'+j.type+'</span>':''}<br>
+      <span class="you">你：${esc(j.text)}</span><br>${esc(j.out.length > 90 ? j.out.slice(0,90)+'…' : j.out)}
+      ${j.lost && j.lost.length ? `<br><span style="color:var(--earth)">失去了：${esc(j.lost.join('、'))}</span>` : ''}
+      ${j.help ? '<br><span style="color:var(--acacia)">巡护队化解了这次人为威胁</span>' : ''}</li>`).join('');
+  const rel = Object.keys(S.chars).map(k => {
+    const c = S.chars[k]; const mem = c.mem.length ? c.mem[c.mem.length-1].replace(/^第\d+天：/,'') : '';
+    return `<div class="rel ${c.gone?'gone':''}"><div><b>${esc(c.name)}</b> <i>${esc(c.maa||'')}</i>${k==='mom'?'':SXT(c.sex)} <span class="rl">${esc(c.role)}${c.gone?' · 没能活下来':''}</span></div>
+      <div class="bar"><div class="t"><div class="f mom" style="width:${c.bond}%"></div></div><span style="width:28px;text-align:right">${c.bond}</span></div>
+      ${mem ? `<div class="mem">它记得：${esc(mem)}</div>` : ''}</div>`;
+  }).join('');
+  const know = threats.map(k => {
+    const pl = k==='snake' && S.snakeSeen ? SNAKE_PLATE[S.snakeSeen] : EV[k].plate;
+    return `<li><b>${esc(pl[0])}</b> <i>${esc(pl[1])}</i><br>${esc(SIMBA_OFF[k]||'')}</li>`;
+  }).join('');
+  const future = win ? (S.sex==='m'
+      ? '你是一只小雄狮。两三岁时，你会被狮群里的雄狮赶走，和同龄的兄弟一起流浪，直到有一天，去争夺属于自己的领地。'
+      : '你是一只小母狮。你会一直留在这个狮群，和妈妈、姨妈们一起狩猎；有一天，你也会独自走进河边的灌丛，生下自己的孩子。')
+    : (reason || '');
+
+  $('repBody').innerHTML = `
+    <div class="rsec"><h3>一 · 档案</h3>
+      <table class="arc">
+        <tr><td>名字</td><td><b>${esc(S.name)}</b> <i>${esc(S.maa||'')}</i>${S.meaning?`<span class="rl">　马赛语：${esc(S.meaning)}</span>`:''}</td></tr>
+        <tr><td>性别</td><td>${S.sex==='m'?'雄性 ♂':'雌性 ♀'}</td></tr>
+        <tr><td>出生地</td><td>马赛马拉 · 恩提亚克提亚克河边的灌丛</td></tr>
+        <tr><td>母亲</td><td>纳塞里安 <i>Naserian</i>（和平）</td></tr>
+        <tr><td>活了</td><td>${S.age} 天 · ${endReason(win)}</td></tr>
+        <tr><td>这一窝</td><td>连你在内 ${S.litter + 1} 只，活下来 ${aliveN} 只<br>同窝：${famHTML}</td></tr>
+        <tr><td>住过的灌丛</td><td>${esc(dens)}</td></tr>
+        <tr><td>巡护</td><td>巡护队帮了你们 ${S.patrolHelps} 次 · 你求助星巴 ${S.simbaAsks} 次</td></tr>
+      </table>
+      <p>${esc(future)}</p>
+    </div>
+    <div class="rsec"><h3>二 · 性格（MBTI）</h3>
+      <div class="mbti"><div class="big">${m.type}</div><div><div class="ttl">${title}</div><div class="rl">${desc}</div></div></div>
+      ${m.bars.map(bar).join('')}
+      <p class="rl" style="font-size:12px">根据你这一局的 ${S.journey.length} 次选择统计：躲藏或叫唤、探索或吃奶、亲近家人或只顾自己、行事稳定或随性多变。</p>
+    </div>
+    <div class="rsec"><h3>三 · 成长经历</h3><ol class="tl">${timeline}</ol></div>
+    <div class="rsec"><h3>四 · 关系</h3>${rel}</div>
+    <div class="rsec"><h3>五 · 野外知识</h3><ul class="know">${know || '<li>这一局没有遇到威胁。</li>'}</ul></div>
+    <div class="rsec note"><h3>六 · 星巴的观察笔记</h3><div id="simbaNote" class="rl">星巴正在写观察笔记……</div></div>`;
+  window.scrollTo(0,0);
+  writeSimbaNote(win, reason).then(() => makeCard(win));
+  makeCard(win);
+}
+
+/* 这一局最难忘的一刻：失去手足 > 受伤 > 巡护化解 > 其他威胁 */
+function keyMoment(){
+  const main = Object.values(MAIN);
+  const score = j => (j.lost && j.lost.length ? 4 : 0) + (j.hurt ? 3 : 0) + (j.help ? 2 : 0) + (main.includes(j.evId) ? 0 : 1);
+  const list = [...S.journey].sort((a,b) => score(b) - score(a));
+  return list[0] && score(list[0]) > 0 ? list[0] : null;
+}
+function fallbackNote(win){
+  const k = keyMoment();
+  const lost = S.journey.flatMap(j => j.lost || []);
+  let mid = '';
+  if (k){
+    const first = (k.out.split(/[。！？]/).find(x => x.trim().length > 6) || '').trim();
+    mid = `第${k.age}天，“${k.title}”${EV[k.evId].night ? '的那一夜' : '那天'}，它选择了${k.text}。${first ? first + '。' : ''}`
+      + (k.help ? '那一次，巡护员赶在了前面。' : '');
+  }
+  return `我在恩提亚克提亚克河边第一次记下这窝幼崽时，${S.name}还闭着眼睛，只会循着纳塞里安的气味往她怀里拱。${mid}`
+    + (lost.length ? `这一窝里，${lost.join('、')}没能走到最后。` : '')
+    + (win ? `两个月后，纳塞里安把它带回了狮群。它活下来了，这在野外从来不是理所当然的事。` : `它在第 ${S.age} 天离开了。草原从不偏袒谁，可我们能做的，是让下一窝幼狮少遇到一个钢丝套、少一具投毒的牛尸。`);
+}
+async function writeSimbaNote(win, reason){
+  let txt = '';
+  if (sample){
+    try {
+      const m = S.mbti;
+      const tl = S.journey.map(j => `第${j.age}天「${j.title}」：它${j.text}；${j.out.slice(0,50)}${j.lost&&j.lost.length?'；失去了'+j.lost.join('、'):''}`).join('\n');
+      const prompt = `你是星巴（Simba），一位在马赛马拉与狮群共同生活了16年的华人野生动物保护者。你每天带着巡护员在恩提亚克提亚克河一带巡护，一直在观察一窝由母狮纳塞里安（Naserian，马赛语“和平”）独自抚养的幼狮。
+请为其中一只幼狮写一段“观察笔记”，用第一人称、野外笔记的口吻，真诚、克制、有细节，不煽情，中文，180到240字。
+
+幼狮：${S.name}${S.maa?`（马赛语 ${S.maa}${S.meaning?'，意思是“'+S.meaning+'”':''}）`:''}，${S.sex==='m'?'雄性':'雌性'}。
+结局：${win?'活过了两个月，被母亲带回了狮群':`在出生第${S.age}天死去。${reason||''}`}。
+性格（仅供你理解，不要写进笔记）：${m.type}，${MBTI_INFO[m.type][1]}
+这一窝共${S.litter+1}只，活下来${sibs().length + (win?1:0)}只。巡护队帮了它们${S.patrolHelps}次。
+它的经历：
+${tl}
+
+要求：通过一两个具体的关键时刻，让读者自己感受到它的性格，但不要直接下性格结论——不要提 MBTI、性格类型，也不要用这些词：${MBTI_INFO[S.mbti.type][0]}、${MBTI_INFO[S.mbti.type][1]}。不要复述它名字的含义。结尾落到保护的意义上，但不要说教。不要提任何具体保护地的名字。只输出笔记正文。`;
+      const r1 = await sample(prompt, { modelTier:'default' });
+      txt = String(r1.text||'').trim();
+    } catch(e){ txt = ''; }
+  }
+  if (!txt) txt = fallbackNote(win);
+  S.note = txt;
+  const el = $('simbaNote');
+  if (el){ el.classList.remove('rl'); el.innerHTML = esc(txt).replace(/\n+/g,'<br>') + '<div class="sig">—— 星巴，于恩提亚克提亚克河边</div>'; }
+}
+
+/* ============ 小红书分享卡片（3:4） ============ */
+let cardBlob = null, downloads = null;
+(async () => { try { if (window.claude && typeof window.claude.use === 'function') downloads = await window.claude.use('downloads'); } catch(e){ downloads = null; } })();
+function wrapText(ctx, text, x, y, maxW, lh, maxLines){
+  const chars = [...text]; let line = '', lines = [];
+  for (const ch of chars){ if (ctx.measureText(line + ch).width > maxW){ lines.push(line); line = ch; } else line += ch; }
+  if (line) lines.push(line);
+  if (maxLines && lines.length > maxLines){ lines = lines.slice(0, maxLines); lines[maxLines-1] = lines[maxLines-1].slice(0,-1) + '…'; }
+  lines.forEach((l,i) => ctx.fillText(l, x, y + i*lh));
+  return y + lines.length*lh;
+}
+function loadSVG(svg){
+  return new Promise(res => { const img = new Image(); img.onload = () => res(img); img.onerror = () => res(null); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
+}
+async function makeCard(win){
+  try { await document.fonts.ready; } catch(e){}
+  const W = 1080, H = 1440, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext && cv.getContext('2d');
+  if (!x) return;
+  const serif = '"Noto Serif SC","Songti SC",serif';
+  x.fillStyle = '#f2e7cd'; x.fillRect(0,0,W,H);
+  const g = x.createRadialGradient(200,0,50,200,0,900); g.addColorStop(0,'rgba(181,118,44,.16)'); g.addColorStop(1,'rgba(181,118,44,0)'); x.fillStyle = g; x.fillRect(0,0,W,H);
+  x.strokeStyle = '#6b5538'; x.lineWidth = 2; x.strokeRect(36,36,W-72,H-72); x.lineWidth = 1; x.strokeRect(48,48,W-96,H-96);
+  x.fillStyle = '#b5762c'; x.font = `600 30px ${serif}`; x.textAlign = 'center';
+  x.fillText('幼 狮 成 长 记 · 野 外 观 察 档 案', W/2, 108);
+  const img = await loadSVG(cubPortraitSVG({ age:S.age, col:S.myColor, win, momGone:S.momDead, day:S.age, noCub:true, note: S.name + (S.sex==='m'?' ♂':' ♀') }));
+  if (img){ x.drawImage(img, 90, 140, 900, 506); }
+  x.strokeStyle = '#6b5538'; x.lineWidth = 2; x.strokeRect(90,140,900,506);
+  x.textAlign = 'left'; x.fillStyle = '#3a2a1a';
+  x.font = `900 72px ${serif}`; x.fillText(S.name, 90, 740);
+  const nw = x.measureText(S.name).width;
+  x.font = `italic 34px Georgia,serif`; x.fillStyle = '#6b5538'; x.fillText(`${S.maa||''} ${S.sex==='m'?'♂':'♀'}`, 90 + nw + 20, 738);
+  x.font = `30px ${serif}`; x.fillText(S.meaning ? `马赛语：${S.meaning}` : '马赛马拉 · 恩提亚克提亚克河', 90, 790);
+  // MBTI
+  x.fillStyle = '#9c4a2a'; x.font = `900 120px Georgia,serif`; x.fillText(S.mbti.type, 90, 940);
+  x.fillStyle = '#3a2a1a'; x.font = `700 40px ${serif}`; x.fillText(MBTI_INFO[S.mbti.type][0], 470, 885);
+  x.fillStyle = '#6b5538'; x.font = `28px ${serif}`; wrapText(x, MBTI_INFO[S.mbti.type][1], 470, 930, 520, 40, 2);
+  // 结局行
+  x.fillStyle = '#5f6f34'; x.font = `700 36px ${serif}`;
+  x.fillText(win ? `活过 ${S.age} 天 · 回到了狮群` : `活了 ${S.age} 天 · 草原的法则`, 90, 1050);
+  x.fillStyle = '#6b5538'; x.font = `28px ${serif}`;
+  x.fillText(`这一窝 ${S.litter+1} 只，活下来 ${sibs().length + (win?1:0)} 只 · 巡护队帮了 ${S.patrolHelps} 次`, 90, 1098);
+  // 星巴笔记摘句
+  const quote = pickQuote();
+  if (quote){
+    x.strokeStyle = '#5f6f34'; x.lineWidth = 4; x.beginPath(); x.moveTo(92,1140); x.lineTo(92,1260); x.stroke();
+    x.fillStyle = '#3a2a1a'; x.font = `30px ${serif}`; const yEnd = wrapText(x, quote.trim() + '。', 116, 1172, 860, 44, 3);
+    x.fillStyle = '#6b5538'; x.font = `24px ${serif}`; x.fillText('—— 星巴的观察笔记', 116, yEnd + 6);
+  }
+  x.textAlign = 'center'; x.fillStyle = '#9c8a68'; x.font = `24px ${serif}`;
+  x.fillText('你也来活一次：幼狮成长记 · AI 狮群', W/2, H - 76);
+  return new Promise(res => cv.toBlob(b => {
+    cardBlob = b;
+    if (b){ const u = URL.createObjectURL(b); $('cardImg').src = u; $('cardWrap').classList.remove('hidden'); }
+    $('saveCardBtn').classList.toggle('hidden', !b);
+    $('cardHint').textContent = downloads ? '点“保存分享卡片”存到相册，发小红书。' : '长按图片即可保存，发小红书。';
+    res();
+  }, 'image/png'));
+}
+/* 摘句：避开与卡片上已有内容（MBTI、称号、性格描述、名字含义）重复的句子，优先写具体事件的句子 */
+function pickQuote(){
+  const sents = (S.note || '').split(/[。！？\n]/).map(x => x.trim()).filter(x => x.length >= 12 && x.length <= 66);
+  const [title, desc] = MBTI_INFO[S.mbti.type];
+  const ban = [S.mbti.type, 'MBTI', '性格', '马赛语', S.maa, S.meaning, title, title.replace(/^.*的/,''), ...desc.split(/[，、。：；]/).filter(x => x.length >= 2)].filter(Boolean);
+  const ok = sents.filter(x => !ban.some(w => x.includes(w)));
+  const evWords = ['夜','第','那天','那一','河','雨','水','灌丛','鬣狗','花豹','河马','大象','水牛','狒狒','蛇','岩蟒','雄狮','巡护','钢丝','牛'];
+  const sc = x => evWords.filter(w => x.includes(w)).length + (/第\s?\d+\s?天/.test(x) ? 2 : 0) + Math.min(x.length, 50)/50;
+  const best = ok.sort((a,b) => sc(b) - sc(a))[0];
+  if (best) return best;
+  const k = keyMoment();
+  return k ? `第${k.age}天，${k.title}，它选择了“${k.text}”` : '';
+}
+async function saveCard(){
+  if (!cardBlob) return;
+  if (!downloads){ $('cardHint').textContent = '这里不能直接保存，请长按上面的图片保存。'; return; }
+  try { await downloads.save({ filename:`幼狮成长记-${S.name}-${S.mbti.type}.png`, data: cardBlob }); $('cardHint').textContent = '已保存。'; }
+  catch(e){ $('cardHint').textContent = (e && e.code==='declined') ? '已取消保存。' : '保存没有成功，可以长按图片保存。'; }
+}
+
+/* ============ 参数面板 ============ */
+function openParams(){
+  const groups = {};
+  PDEF.forEach(d => (groups[d[0]] = groups[d[0]] || []).push(d));
+  $('paramBody').innerHTML = Object.entries(groups).map(([g, rows]) => `<div class="pg">${g}</div>` + rows.map(([, k, label, def, step]) =>
+    `<div class="prow ${P[k]!==def?'chg':''}"><span>${label}<br><small style="color:var(--ink2)">默认 ${def}</small></span><input type="number" inputmode="decimal" step="${step}" data-k="${k}" value="${P[k]}"></div>`).join('')).join('');
+  $('paramBody').querySelectorAll('input').forEach(inp => inp.oninput = () => inp.parentElement.classList.toggle('chg', Number(inp.value) !== PDEFAULT[inp.dataset.k]));
+  $('paramMeta').textContent = `当前来源：${PMETA.source}${PMETA.updated ? '（' + PMETA.updated.slice(0,10) + ' 更新）' : ''}`;
+  $('paramMsg').textContent = '';
+  $('paramSheet').classList.add('on');
+}
+function readParamInputs(){
+  const out = {};
+  $('paramBody').querySelectorAll('input').forEach(inp => { const v = Number(inp.value); out[inp.dataset.k] = Number.isFinite(v) ? v : PDEFAULT[inp.dataset.k]; });
+  return out;
+}
+function resetParams(){
+  $('paramBody').querySelectorAll('input').forEach(inp => { inp.value = PDEFAULT[inp.dataset.k]; inp.parentElement.classList.remove('chg'); });
+  $('paramMsg').textContent = '已恢复默认值，点“保存”后生效。';
+}
+async function saveParams(){
+  const vals = readParamInputs();
+  const NOT_PROB = ['bond_weight','away_mult','nomad_weight'];
+  for (const k in vals){
+    const d = PDEF.find(x => x[1] === k);
+    if (d[3] < 1 && !NOT_PROB.includes(k) && (vals[k] < 0 || vals[k] > 1)) { $('paramMsg').textContent = `“${d[2]}”是概率，需要在 0 到 1 之间。`; return; }
+  }
+  if (!db){ $('paramMsg').textContent = '需要登录 claude.ai 打开才能保存。'; return; }
+  const doc = { params: vals, source: '野外校准', updated: new Date().toISOString() };
+  $('paramMsg').textContent = '保存中…';
+  try {
+    await db.doc(CFG_PATH).set(doc);
+    applyParams(doc); updateParamBadge();
+    $('paramMsg').textContent = '已保存。新的一局开始时，所有玩家都会使用这组参数。';
+  } catch (e) { $('paramMsg').textContent = '保存失败：只有作者能修改生态参数。'; }
+}
+
+/* ============ 绑定 ============ */
+$('startScene').innerHTML = sceneSVG({ den:'low', ev:'', time:'dawn', plate:['恩提亚克提亚克河','Ntiakitiak River'], cubs:3, age:8, momName:'母狮', dayNote:'出生前夜 · 黎明' });
+let nameEdited = false;
+$('nameIn').addEventListener('input', () => { nameEdited = true; });
+document.querySelectorAll('#sexSeg button').forEach(b => b.onclick = () => {
+  sexChoice = b.dataset.v; document.querySelectorAll('#sexSeg button').forEach(x => x.classList.toggle('on', x === b));
+  if (!nameEdited) $('nameIn').value = sexChoice==='random' ? '' : DEFAULT_NAME[sexChoice];
+  $('nameIn').placeholder = sexChoice==='random' ? '留空则按性别取默认马赛语名字' : '';
+});
+$('startBtn').onclick = () => {
+  const sex = sexChoice === 'random' ? (r(.5) ? 'm' : 'f') : sexChoice;
+  const name = $('nameIn').value.trim() || DEFAULT_NAME[sex];
+  S = newState(name, sex); S.denHistory = [S.den]; S.myColor = MY_COLOR;
+  $('log').innerHTML = '';
+  $('start').classList.add('hidden'); $('end').classList.add('hidden'); $('game').classList.remove('hidden');
+  addLog('sys', aiReady ? '妈妈和兄弟姐妹由 AI 实时扮演 · 点击头像查看它们记得的事' : '离线版 · 完整的 AI 狮群版本在 claude.ai');
+  startTurn();
+};
+$('saveCardBtn').onclick = saveCard;
+$('againBtn').onclick = () => { $('end').classList.add('hidden'); $('start').classList.remove('hidden'); };
+$('freeBtn').onclick = () => act($('freeIn').value, null);
+$('freeIn').addEventListener('keydown', e => { if (e.key === 'Enter') act($('freeIn').value, null); });
+$('simbaBtn').onclick = () => { if (!S.busy) $('simbaSheet').classList.add('on'); };
+$('simbaAsk').onclick = askSimba;
+$('simbaIn').addEventListener('keydown', e => { if (e.key === 'Enter') askSimba(); });
+document.querySelectorAll('.sheet').forEach(s => s.addEventListener('click', e => { if (e.target === s) s.classList.remove('on'); }));
+</script>
+</body>
+</html>
